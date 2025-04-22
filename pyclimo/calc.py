@@ -6,6 +6,14 @@ This file holds the functions that perform calculations.
 import math
 import numpy as np
 
+def mm_to_in(mm):
+
+    """
+    Convers millimeters to inches
+    """
+
+    return mm * 0.0393701
+
 def celsius_to_fahrenheit(c):
     
     """
