@@ -97,6 +97,61 @@ def prism_file_structure(dtype, region, variable, year, month, day, resolution, 
     else:
         os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}")
 
+    if dtype == 'DAILY':
+
+        if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}")
+
+        if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}")
+
+        if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{day}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{day}")
+
+        if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{day}/{resolution}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{day}/{resolution}")
+
+        if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{day}/{resolution}/{reference_system}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{day}/{resolution}/{reference_system}")
+
+        path = f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{day}/{resolution}/{reference_system}"
+        path_print = f"f:Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{day}/{resolution}/{reference_system}"
+
+    if dtype == 'MONTHLY':
+
+        if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}")
+
+        if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}")
+
+        if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{resolution}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{resolution}")
+
+        if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{resolution}/{reference_system}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{resolution}/{reference_system}")
+
+        path = f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{resolution}/{reference_system}"
+        path_print = f"f:Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{resolution}/{reference_system}"
+
     if dtype == 'NORMALS':
 
         if os.path.exists(f"Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{month}"):
