@@ -1,7 +1,74 @@
 import os
 
+def noaa_psl_directory(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date):
 
-def prism_file_structure(dtype, region, variable, year, month, day, resolution, normal_type, reference_system):
+
+    variable = variable.upper()
+    level_type = level_type.upper()
+    
+    start_year = f"{start_date[0]}{start_date[1]}{start_date[2]}{start_date[3]}"
+    start_month = f"{start_date[5]}{start_date[6]}"
+    start_day = f"{start_date[8]}{start_date[9]}"
+    
+    end_year = f"{end_date[0]}{end_date[1]}{end_date[2]}{end_date[3]}"
+    end_month = f"{end_date[5]}{end_date[6]}"
+    end_day = f"{end_date[8]}{end_date[9]}"
+
+    if western_bound <= 0:
+        wsym = 'W'
+    if western_bound > 0:
+        wsym = 'E'
+    if eastern_bound <= 0:
+        esym = 'W'
+    if eastern_bound > 0:
+        esym = 'E'  
+    if southern_bound >= 0:
+        ssym = 'N'
+    if southern_bound < 0:
+        ssym = 'S'
+    if northern_bound >= 0:
+        nsym = 'N'
+    if northern_bound < 0:
+        nsym = 'S'
+
+    if os.path.exists(f"Climate Analysis Graphics"):
+        pass
+    else:
+        os.mkdir(f"Climate Analysis Graphics")
+
+    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL"):
+        pass
+    else:
+        os.mkdir(f"Climate Analysis Graphics/NOAA PSL")
+
+    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}"):
+        pass
+    else:
+        os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}")
+
+    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}"):
+        pass
+    else:
+        os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}")
+
+    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}"):
+        pass
+    else:
+        os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}")
+
+    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}"):
+        pass
+
+    else:
+        os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}")
+
+    path = f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}"
+    path_print = f"f:Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}"
+
+    return path, path_print
+
+
+def prism_file_directory(dtype, region, variable, year, month, day, resolution, normal_type, reference_system):
 
     """
     This function builds the file structure for the PRISM Climate Data Graphics
