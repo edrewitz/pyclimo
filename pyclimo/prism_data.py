@@ -18,7 +18,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from zipfile import ZipFile
-from pyclimo.calc import relative_humidity_from_temperature_and_dewpoint, celsius_to_fahrenheit
+from calc import relative_humidity_from_temperature_and_dewpoint, celsius_to_fahrenheit
 
 def extract_zipped_files(file_path, extraction_folder):
 
@@ -278,12 +278,15 @@ def get_geotiff_data(dtype, region, variable, year, month, day, resolution, norm
 
         else:
             url_norm = f"https://data.prism.oregonstate.edu/normals/{region.lower()}/{resolution.lower()}/{variable.lower()}/monthly"
-            url_data = f"https://data.prism.oregonstate.edu/monthly/{variable.lower()}/{year}"
+            url_data = f"https://data.prism.oregonstate.edu/time_series/{region.lower()}/an/{resolution.lower()}/{variable.lower()}/monthly/{year}/"
+            
     
             fname_norm = f"prism_{variable.lower()}_{region.lower()}_25m_2020{month}_avg_30y.zip"
             geotif_norm = f"prism_{variable.lower()}_{region.lower()}_25m_2020{month}_avg_30y.tif"
-            fname_data = f"PRISM_{variable.lower()}_stable_{resolution.lower()}M3_{year}{month}_bil.zip"
-            geotif_data = f"PRISM_{variable.lower()}_stable_{resolution.lower()}M3_{year}{month}_bil.bil"
+            fname_data = f"prism_{variable.lower()}_{region.lower()}_25m_{year}{month}.zip"
+            geotif_data = f"prism_{variable.lower()}_{region.lower()}_25m_{year}{month}.tif"
+            
+            
     
             urllib.request.urlretrieve(f"{url_norm}/{fname_norm}", f"{fname_norm}")
             urllib.request.urlretrieve(f"{url_data}/{fname_data}", f"{fname_data}")
@@ -309,10 +312,18 @@ def get_geotiff_data(dtype, region, variable, year, month, day, resolution, norm
                 df = pd.DataFrame()
                 df = df_data
             else:
-                df = pd.DataFrame()
-                df['latitude'] = df_data['latitude']
-                df['longitude'] = df_data['longitude']
-                df[variable] = df_data[variable.lower()] - df_norm[variable.lower()]
+                variable = variable.lower()
+                if variable == 'ppt':
+                    df = pd.DataFrame()
+                    df['latitude'] = df_data['latitude']
+                    df['longitude'] = df_data['longitude']
+                    df[variable] = (df_data[variable]/df_norm[variable]) * 100
+
+                else:
+                    df = pd.DataFrame()
+                    df['latitude'] = df_data['latitude']
+                    df['longitude'] = df_data['longitude']
+                    df[variable] = df_data[variable.lower()] - df_norm[variable.lower()]
     
     if dtype == 'Normals' or dtype == 'normals':
         if variable == 'rhmean':
