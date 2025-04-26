@@ -5,17 +5,17 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import numpy as np
 import pandas as pd
-import pyclimo.cmaps
+import cmaps
 
 from metpy.plots import USCOUNTIES
 from datetime import datetime, timedelta
-from pyclimo.geometry import get_shapes
-from pyclimo.file_funcs import prism_file_structure
+from geometry import get_shapes
+from file_funcs import prism_file_directory
 from dateutil import tz
-from pyclimo.time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
-from pyclimo.coords import get_cwa_coords, get_region_info
-from pyclimo.prism_data import get_geotiff_data
-from pyclimo.calc import celsius_to_fahrenheit, roundup, rounddown, mm_to_in
+from time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
+from coords import get_cwa_coords, get_region_info
+from prism_data import get_geotiff_data
+from calc import celsius_to_fahrenheit, roundup, rounddown, mm_to_in
 
 mpl.rcParams['font.weight'] = 'bold'
 props = dict(boxstyle='round', facecolor='wheat', alpha=1)
@@ -36,7 +36,7 @@ from_zone = tz.tzutc()
 to_zone = tz.tzlocal()
 
 
-def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type, resolution='4km', clear_data_in_folder=True, western_bound=None, eastern_bound=None, southern_bound=None, northern_bound=None, reference_system='States & Counties', show_state_borders=False, show_county_borders=False, show_gacc_borders=False, show_psa_borders=False, show_cwa_borders=False, show_nws_firewx_zones=False, show_nws_public_zones=False, state_border_linewidth=1, county_border_linewidth=0.25, gacc_border_linewidth=1, psa_border_linewidth=0.5, cwa_border_linewidth=1, nws_firewx_zones_linewidth=0.25, nws_public_zones_linewidth=0.25, state_border_linestyle='-', county_border_linestyle='-', gacc_border_linestyle='-', psa_border_linestyle='-', cwa_border_linestyle='-', nws_firewx_zones_linestyle='-', nws_public_zones_linestyle='-', region='conus', x1=0.01, y1=-0.03, x2=0.725, y2=-0.025, x3=0.01, y3=0.01, cwa=None, signature_fontsize=6, stamp_fontsize=5, shrink=0.7, plot_anomaly=True):
+def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type, resolution='4km', clear_data_in_folder=True, western_bound=None, eastern_bound=None, southern_bound=None, northern_bound=None, reference_system='States & Counties', show_state_borders=False, show_county_borders=False, show_gacc_borders=False, show_psa_borders=False, show_cwa_borders=False, show_nws_firewx_zones=False, show_nws_public_zones=False, state_border_linewidth=1, county_border_linewidth=0.25, gacc_border_linewidth=1, psa_border_linewidth=0.5, cwa_border_linewidth=1, nws_firewx_zones_linewidth=0.25, nws_public_zones_linewidth=0.25, state_border_linestyle='-', county_border_linestyle='-', gacc_border_linestyle='-', psa_border_linestyle='-', cwa_border_linestyle='-', nws_firewx_zones_linestyle='-', nws_public_zones_linestyle='-', region='conus', x1=0.01, y1=-0.03, x2=0.725, y2=-0.025, x3=0.01, y3=0.01, cwa=None, signature_fontsize=6, stamp_fontsize=5, shrink=0.7, plot_anomaly = False):
 
     """
     This function downloads and plots PRISM Climate Data and saves the graphics to a folder. 
@@ -243,9 +243,6 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
             "Fraction by which to multiply the size of the colorbar." 
             This should only be changed if the user wishes to change the size of the colorbar. 
             Preset values are called from the settings module for each state and/or gacc_region.
-
-    37) plot_anomaly (Boolean) - Default=True - When set to True, the function will take the difference between the values from the daily/monthly data file
-        and the values for the daily/monthly 1991-2020 climatological normal file. 
     
 
     Returns
@@ -379,7 +376,7 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
             if region == 'CONUS' or region == 'conus':
                 county_border_linewidth=0.25   
 
-    path, path_print = prism_file_structure(dtype, region, variable, year, month, day, resolution, normal_type, reference_system)
+    path, path_print = prism_file_directory(dtype, region, variable, year, month, day, resolution, normal_type, reference_system)
 
     if plot_anomaly == False:
         fname = f"{variable.upper()}.png"
@@ -451,21 +448,21 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
         if variable == 'tmin':
             title_var = 'Minimum Temperature'
         if dtype == 'Normals' or dtype == 'normals':
-            title_left = f"{normal_type.upper()} {title_var.upper()} [°C] 30-Year (1991-2020) Normal"
+            title_left = f"{normal_type.upper()} {title_var.upper()} [°F] 30-Year (1991-2020) Normal"
             if normal_type == 'Daily' or normal_type == 'daily':
                 title_right = f"Valid: {mon}-{day}"
             if normal_type == 'Monthly' or normal_type == 'monthly':
                 title_right = f"Valid: {mon}"
         if dtype == 'Daily' or dtype == 'daily':
             if plot_anomaly == False:
-                title_left = f"{title_var.upper()} [°C]"
+                title_left = f"{title_var.upper()} [°F]"
                 title_right = f"Valid: {year}-{mon}-{day}"
             else:
                 title_left = f"{title_var.upper()} ANOMALY [°C] (Based on a 1991-2020 Climatology)"
                 title_right = f"Valid: {year}-{mon}-{day}"                
         if dtype == 'Monthly' or dtype == 'monthly':
             if plot_anomaly == False:
-                title_left = f"{title_var.upper()} [°C]"
+                title_left = f"{title_var.upper()} [°F]"
                 title_right = f"Valid: {year}-{mon}" 
             else:
                 title_left = f"{title_var.upper()} ANOMALY [°C] (Based on a 1991-2020 Climatology)"
@@ -483,6 +480,12 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
         else:
             ticks = levels[::1]
         title_var = 'Mean Dew Point Temperature'
+        if dtype == 'Daily' or dtype == 'daily':
+            title_left = f"{title_var.upper()} [°F]"
+            title_right = f"Valid: {year}-{mon}-{day}"               
+        if dtype == 'Monthly' or dtype == 'monthly':
+            title_left = f"{title_var.upper()} [°F]"
+            title_right = f"Valid: {year}-{mon}" 
         if dtype == 'Normals' or dtype == 'normals':
             title_left = f"{normal_type.upper()} {title_var.upper()} [°F] 30-Year (1991-2020) Normal"
             if normal_type == 'Daily' or normal_type == 'daily':
@@ -502,6 +505,19 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
                 title_right = f"Valid: {mon}-{day}"
             if normal_type == 'Monthly' or normal_type == 'monthly':
                 title_right = f"Valid: {mon}"
+
+    elif variable == 'ppt':
+        cmap = cmaps.precipitation_anomaly_colormap()
+        if dtype == 'Monthly' or dtype == 'monthly':
+            if plot_anomaly == True:
+                levels = np.arange(0, 201, 1)
+                vmin = 0
+                vmax = 200
+                ticks = levels[::10]
+                title_var = 'Percent of Monthly Normal Precipitation'
+                title_left = f"{title_var.upper()} BASED ON 30-YEAR(1991-2020) NORMAL"
+                title_right = f"Valid: {mon}{year}"
+            
 
     fig = plt.figure(figsize=(12,12))
     fig.set_facecolor('aliceblue')
