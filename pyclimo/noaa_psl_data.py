@@ -91,8 +91,10 @@ def get_psl_netcdf(variable, level_type, western_bound, eastern_bound, southern_
         ds = xr.open_dataset(f"http://psl.noaa.gov/thredds/dodsC/Aggregations/ncep.reanalysis/{directory}/{file}", engine='netcdf4')
         ds = shift_longitude(ds)
         ds = ds.sel(lon=slice(western_bound, eastern_bound, 1), lat=slice(northern_bound, southern_bound, 1), time=slice(start, end))
+        
+        return ds
     else:
         print(f"NOAA PSL THREDDS Server is currently down. Please try again later...")
         sys.exit()
 
-    return ds
+    
