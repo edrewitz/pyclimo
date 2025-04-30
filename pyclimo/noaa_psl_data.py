@@ -1,3 +1,9 @@
+"""
+This file has functions for data access from the NOAA Physical Science Laboratory THREDDS Server. 
+
+This file is written by: Eric J. Drewitz
+"""
+
 import xarray as xr
 import requests
 import sys
