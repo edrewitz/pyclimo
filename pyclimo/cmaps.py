@@ -27,6 +27,16 @@ def temperature_change_colormap():
 
     return temperature_change_colormap
 
+def eof_colormap_1():
+    eof_colormap_1 = matplotlib.colors.LinearSegmentedColormap.from_list("eof", ["darkblue", "blue", "deepskyblue", "white", "white", "orangered", "red", "darkred"])
+
+    return eof_colormap_1
+
+def eof_colormap_2():
+    eof_colormap_2 = matplotlib.colors.LinearSegmentedColormap.from_list("eof", ["saddlebrown", "orange", "gold", "white", "white", "lawngreen", "springgreen", "lime"])
+
+    return eof_colormap_2
+
 def dew_point_change_colormap():
     dew_point_change_colormap = matplotlib.colors.LinearSegmentedColormap.from_list("dew point change", ["darkorange", "darkkhaki", "lightgrey", "forestgreen", "aqua"])
 
