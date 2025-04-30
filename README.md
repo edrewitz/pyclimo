@@ -6,11 +6,11 @@ A climate data analysis data visualization package.
 
 # Table of Contents
 
-[Documentation]()
+[Documentation](https://github.com/edrewitz/pyclimo/edit/main/README.md#documentation)
 
 [Jupyter Lab Examples]()
 
-[Citations](#citations)
+[Citations](https://github.com/edrewitz/pyclimo/blob/main/README.md#citations)
 
 # Documentation
 
