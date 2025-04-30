@@ -31,6 +31,11 @@ def noaa_psl_directory(variable, level_type, western_bound, eastern_bound, south
     if northern_bound < 0:
         nsym = 'S'
 
+    western_bound = abs(western_bound)
+    eastern_bound = abs(eastern_bound)
+    southern_bound = abs(southern_bound)
+    northern_bound = abs(northern_bound)
+
     if os.path.exists(f"Climate Analysis Graphics"):
         pass
     else:
