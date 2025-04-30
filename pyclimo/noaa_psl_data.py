@@ -20,7 +20,13 @@ def get_variable_paths(variable, level_type):
 
     if level_type == 'pressure' or level_type == 'pressure level':
         var_paths = {
-        'air':['pressure', 'air.nc']
+        'air':['pressure', 'air.nc'],
+        'hgt':['pressure', 'hgt.nc'],
+        'rhum':['pressure', 'rhum.nc'],
+        'shum':['pressure', 'shum.nc'],
+        'omega':['pressure', 'omega.nc'],
+        'uwnd':['pressure', 'uwnd.nc'],
+        'vwnd':['pressure', 'vwnd.nc']
         }
     
     if level_type == 'surface gauss' or level_type == 'sfc gauss':
@@ -33,13 +39,21 @@ def get_variable_paths(variable, level_type):
         'uwnd':['surface_gauss', 'uwnd.10m.gauss.nc'],
         'vwnd':['surface_gauss', 'vwnd.10m.gauss.nc'],
         'cfnlf':['surface_gauss', 'cfnlf.sfc.gauss.nc'],
-        'shum':['surface_gauss', 'shum.sfc.gauss.nc'],
-        'shum':['surface_gauss', 'shum.sfc.gauss.nc'],
-        'shum':['surface_gauss', 'shum.sfc.gauss.nc'],
-        'shum':['surface_gauss', 'shum.sfc.gauss.nc'],
-        'shum':['surface_gauss', 'shum.sfc.gauss.nc'],
-        'shum':['surface_gauss', 'shum.sfc.gauss.nc'],
-        
+        'pevpr':['surface_gauss', 'pevpr.sfc.gauss.nc']
+        }
+
+    if level_type == 'surface' or level_type == 'surface data':
+        var_paths = {
+        'pr_wtr':['surface', 'pr_wtr.eatm.nc'],
+        'slp':['surface', 'slp.nc'],
+        'pres':['surface', 'pres.sfc.nc'],
+        'air':['surface', 'air.sig995.nc'],
+        'omega':['surface', 'omega.sig995.nc'],
+        'pottmp':['surface', 'pottmp.sig995.nc'],
+        'rhum':['surface', 'rhum.sig995.nc'],
+        'uwnd':['surface', 'uwnd.sig995.nc'],
+        'vwnd':['surface', 'vwnd.sig995.nc'],
+        'lftx':['surface', 'lftx.sfc.nc'],
         }
 
     return var_paths[variable][0], var_paths[variable][1]
