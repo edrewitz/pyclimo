@@ -31,17 +31,78 @@ tzone = get_timezone()
 from_zone = tz.tzutc()
 to_zone = tz.tzlocal()
 
+def get_level_index(level):
+
+    index = {
+
+        '1000':0,
+        '925':1,
+        '850':2,
+        '700':3,
+        '600':4,
+        '500':5,
+        '400':6,
+        '300':7,
+        '250':8,
+        '200':9,
+        '150':10,
+        '100':11,
+        '70':12,
+        '50':13,
+        '30':14,
+        '20':15,
+        '10':16
+
+    }
+
+    return index
+
+
 def plot_titles(variable, level_type):
+
+    if level_type == 'pressure' or level_type == 'pressure level':
+        titles = {
+            'air':'TEMPERATURE',
+            'hgt':'GEOPOTENTIAL HEIGHT',
+            'rhum':'RELATIVE HUMIDITY',
+            'shum':'SPECIFIC HUMIDITY',
+            'omega':'VERTICAL VELOCITY',
+            'uwnd':'U-WIND',
+            'vwnd':'V-WIND'
+
+        }
 
     if level_type == 'surface gauss' or level_type == 'sfc gauss':
         titles = {
             'air':'2-METER TEMPERATURE',
-    
+            'skt':'SKIN TEMPERATURE',
+            'prate':'PRECIPITATION RATE',
+            'lhtfl':'LATENT HEAT FLUX',
+            'shtfl':'SENSIBLE HEAT FLUX',
+            'uwnd':'10-METER U-WIND',
+            'vwnd':'10-METER V-WIND',
+            'cfnlf':'CLOUD FORCING NET LONGWAVE FLUX',
+            'pevpr':'SURFACE POTENTIAL EVAPORATION RATE'    
         }
+
+    if level_type == 'surface' or level_type == 'surface data':
+        titles = {
+        'pr_wtr':'PRECIPITABLE WATER',
+        'slp':'SEA LEVEL PRESSURE',
+        'pres':'SURFACE PRESSURE',
+        'air':'0.995 SIGMA TEMPERATURE',
+        'omega':'0.995 SIGMA VERTICAL VELOCITY',
+        'pottmp':'0.995 SIGMA POTENTIAL TEMPERATURE',
+        'rhum':'0.995 SIGMA RELATIVE HUMIDITY',
+        'uwnd':'0.995 SIGMA U-WIND',
+        'vwnd':'0.995 SIGMA V-WIND',
+        'lftx':'SURFACE LIFTING INDEX'
+        }
+        
     return titles
 
 
-def plot_period_mean_eof1_eof2(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date, globe=False, to_fahrenheit=True, shrink=1):
+def plot_period_mean_eof1_eof2(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date, globe=False, to_fahrenheit=True, shrink=1, x1=0.01, y1=-0.03, x2=0.725, y2=-0.025, y3=-0.05, signature_fontsize=6, stamp_fontsize=5, level='500'):
 
 
     if globe == True:
@@ -59,29 +120,68 @@ def plot_period_mean_eof1_eof2(variable, level_type, western_bound, eastern_boun
 
     ds = get_psl_netcdf(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date)
 
+    level_idx = get_level_index(level)
+    level_idx = level_idx[level]
+
     model = xe.single.EOF(use_coslat=True)
     model.fit(ds, dim="time")
     model.explained_variance_ratio()
     components = model.components()
     scores = model.scores()
     avg = ds.mean(dim='time')
+    
+    eof_range = np.nanmax(components[variable]) + abs(np.nanmin(components[variable]))
+    rs = -1 * eof_range
+    re = eof_range + 0.001
+    eof_levels = np.arange(rs, re, 0.001)
+    eof_ticks = eof_levels[::20]
+    eof_cmap = cmaps.eof_colormap_1()
 
     if variable == 'air':
         avg[variable] = avg[variable] - 273.15
-        #mean_levels = np.arange(np.nanmin(avg[variable]), (np.nanmax(avg[variable])+0.5), 0.5)
-        #eof_levels = np.arange(np.nanmin(components[variable]), (np.nanmax(components[variable])+1), 1)
-        #mean_ticks = mean_levels[::5]
-        #eof_ticks = eof_levels[::5]
         mean_cmap = cmaps.temperature_colormap()
-        eof_cmap = cmaps.temperature_change_colormap()
+        extend = 'both'
         if to_fahrenheit == True:
             avg[variable] = celsius_to_fahrenheit(avg[variable])
-            mean_levels = np.arange(np.nanmin(avg[variable]), (np.nanmax(avg[variable])+1), 1)
+            minima = int(round(np.nanmin(avg[variable]), -1))
+            maxima = int(round(np.nanmax(avg[variable]), -1))
+            mean_levels = np.arange(minima, (maxima + 1), 1)
+            mean_ticks = mean_levels[::5]
             unit = '[°F]'
         else:
             unit = '[°C]'
+            mean_levels = np.arange(np.nanmin(avg[variable]), (np.nanmax(avg[variable])+0.5), 0.5)
+            mean_ticks = mean_levels[::5]
     else:
         pass
+
+    if variable == 'rhum':
+        mean_cmap = cmaps.relative_humidity_colormap()
+        eof_cmap = cmaps.eof_colormap_2()
+        mean_levels = np.arange(0, 101, 1)
+        mean_ticks = mean_levels[::5]
+        extend = 'neither'
+        unit = '[%]'
+
+    if variable == 'slp' or variable == 'pres':
+        avg[variable] = avg[variable]/100
+        mean_cmap = cmaps.temperature_colormap()
+        minima = int(round(np.nanmin(avg[variable]), -1))
+        maxima = int(round(np.nanmax(avg[variable]), -1))
+        mean_levels = np.arange(minima, (maxima + 1), 1)
+        mean_ticks = mean_levels[::5] 
+        unit = '[hPa]'
+        extend = 'both'
+
+    if variable == 'hgt':
+        avg[variable] = (avg[variable][level_idx, :, :])/10
+        mean_cmap = cmaps.temperature_colormap()
+        minima = int(round(np.nanmin(avg[variable]), -1))
+        maxima = int(round(np.nanmax(avg[variable]), -1))
+        mean_levels = np.arange(minima, (maxima + 1), 1)
+        mean_ticks = mean_levels[::5] 
+        unit = '[DM]'
+        extend = 'both'
 
     title = plot_titles(variable, level_type)
     title = title[variable]
@@ -94,35 +194,63 @@ def plot_period_mean_eof1_eof2(variable, level_type, western_bound, eastern_boun
         ax.set_extent([western_bound, eastern_bound, southern_bound, northern_bound], datacrs)
         ax.add_feature(cfeature.COASTLINE.with_scale('50m'), linewidth=0.75, zorder=9)
         ax.add_feature(cfeature.LAND, color='beige', zorder=1)
+        ax.add_feature(cfeature.BORDERS, linestyle='-', zorder=2)
         ax.add_feature(cfeature.OCEAN, color='lightcyan', zorder=1)
         ax.add_feature(cfeature.LAKES, color='lightcyan', zorder=1)
-        ax.add_feature(provinces, linewidth=1, zorder=1)   
-        ax.add_feature(cfeature.STATES, linewidth=0.25, zorder=6)
+        ax.add_feature(provinces, linewidth=1, zorder=2)   
+        ax.add_feature(cfeature.STATES, linewidth=0.25, zorder=2)
     
         if i == 0:
-            fname = f"MEAN {title} {unit}"
-            plt.title(f"MEAN {title} {unit}", fontsize=8, fontweight='bold', loc='left')
+            if level_type == 'pressure' or level_type == 'pressure level':
+                fname = f"MEAN {level} MB {title} {unit}.png"
+                plt.title(f"MEAN {level} MB {title} {unit}", fontsize=8, fontweight='bold', loc='left')
+            else:
+                fname = f"MEAN {title} {unit}.png"
+                plt.title(f"MEAN {title} {unit}", fontsize=8, fontweight='bold', loc='left')
             plt.title(f"PERIOD OF RECORD: {start_date} - {end_date}", fontsize=7, fontweight='bold', loc='right')
-            cs = ax.contourf(avg['lon'], avg['lat'], avg[variable][:, :], transform=datacrs, cmap=mean_cmap)
-            cbar = cbar = fig.colorbar(cs, shrink=shrink, pad=0.01, location='right')
+            ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
+            ax.text(x2, y2, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
+            try:
+                cs = ax.contourf(avg['lon'], avg['lat'], avg[variable][:, :], levels=mean_levels, transform=datacrs, cmap=mean_cmap, extend=extend)
+            except Exception as e:
+                cs = ax.contourf(avg['lon'], avg['lat'], avg[variable][level_idx, :, :], levels=mean_levels, transform=datacrs, cmap=mean_cmap, extend=extend)
+            cbar = cbar = fig.colorbar(cs, shrink=shrink, pad=0.01, location='right', ticks=mean_ticks)
             fig.savefig(f"{path}/{fname}", bbox_inches='tight')
             plt.close(fig)
             print(f"Saved {fname} to {path_print}")   
         if i == 1:
-            fname = f"EOF1 {title}"
-            plt.title(f"EOF1 {title}", fontsize=8, fontweight='bold', loc='left')
+            if level_type == 'pressure' or level_type == 'pressure level':
+                fname = f"EOF1 {level} MB {title} {unit}.png"
+                plt.title(f"EOF1 {level} MB {title} {unit}", fontsize=8, fontweight='bold', loc='left')
+            else:
+                fname = f"EOF1 {title} {unit}.png"
+                plt.title(f"EOF1 {title} {unit}", fontsize=8, fontweight='bold', loc='left')
             plt.title(f"PERIOD OF RECORD: {start_date} - {end_date}", fontsize=7, fontweight='bold', loc='right')
-            cs = ax.contourf(components['lon'], components['lat'], components['air'][0, :, :], transform=datacrs, cmap=eof_cmap)
-            cbar = fig.colorbar(cs, shrink=shrink, pad=0.01, location='right')
+            ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
+            ax.text(x2, y2, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
+            try:
+                cs = ax.contourf(components['lon'], components['lat'], components[variable][0, :, :], levels=eof_levels, transform=datacrs, cmap=eof_cmap, extend='both')
+            except Exception as e:
+                cs = ax.contourf(components['lon'], components['lat'], components[variable][0, level_idx, :, :], levels=eof_levels, transform=datacrs, cmap=eof_cmap, extend='both')
+            cbar = fig.colorbar(cs, shrink=shrink, pad=0.01, location='right', ticks=eof_ticks)
             fig.savefig(f"{path}/{fname}", bbox_inches='tight')
             plt.close(fig)
             print(f"Saved {fname} to {path_print}")   
         if i == 2:
-            fname = f"EOF2 {title}"
-            plt.title(f"EOF2 {title}", fontsize=8, fontweight='bold', loc='left')
+            if level_type == 'pressure' or level_type == 'pressure level':
+                fname = f"EOF2 {level} MB {title} {unit}.png"
+                plt.title(f"EOF2 {level} MB {title} {unit}", fontsize=8, fontweight='bold', loc='left')
+            else:
+                fname = f"EOF2 {title} {unit}.png"
+                plt.title(f"EOF2 {title} {unit}", fontsize=8, fontweight='bold', loc='left')
             plt.title(f"PERIOD OF RECORD: {start_date} - {end_date}", fontsize=7, fontweight='bold', loc='right')
-            cs = ax.contourf(components['lon'], components['lat'], components['air'][1, :, :], transform=datacrs, cmap=eof_cmap) 
-            cbar = fig.colorbar(cs, shrink=shrink, pad=0.01, location='right')
+            ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
+            ax.text(x2, y2, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
+            try:
+                cs = ax.contourf(components['lon'], components['lat'], components[variable][1, :, :], levels=eof_levels, transform=datacrs, cmap=eof_cmap, extend='both')
+            except Exception as e:
+                cs = ax.contourf(components['lon'], components['lat'], components[variable][1, level_idx, :, :], levels=eof_levels, transform=datacrs, cmap=eof_cmap, extend='both')
+            cbar = fig.colorbar(cs, shrink=shrink, pad=0.01, location='right', ticks=eof_ticks)
             fig.savefig(f"{path}/{fname}", bbox_inches='tight')
             plt.close(fig)
             print(f"Saved {fname} to {path_print}")   
@@ -138,10 +266,20 @@ def plot_period_mean_eof1_eof2(variable, level_type, western_bound, eastern_boun
 
         plt.title(f"EOF{e} SCORES", fontsize=12, fontweight='bold', loc='left')
         plt.title(f"PERIOD OF RECORD: {start_date} - {end_date}", fontsize=10, fontweight='bold', loc='right')
+        ax.text(x1, y3, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
+        ax.text(x2, y3, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
 
         ax.plot(scores['time'], scores[i, :], color='black')
-        ax.fill_between(scores['time'], 0, scores[i, :], color='red', where=(scores[i, :] > 0), alpha=0.3)
-        ax.fill_between(scores['time'], scores[i, :], 0, color='blue', where=(scores[i, :] < 0), alpha=0.3)
+
+        if variable == 'rhum':
+            c1 = 'lime'
+            c2 = 'saddlebrown'
+        else:
+            c1 = 'red'
+            c2 = 'blue'
+        
+        ax.fill_between(scores['time'], 0, scores[i, :], color=c1, where=(scores[i, :] > 0), alpha=0.3)
+        ax.fill_between(scores['time'], scores[i, :], 0, color=c2, where=(scores[i, :] < 0), alpha=0.3)
         fig.savefig(f"{path}/{fname}", bbox_inches='tight')
         plt.close(fig)
         print(f"Saved {fname} to {path_print}")  
