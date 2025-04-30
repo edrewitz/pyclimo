@@ -10,7 +10,7 @@ A climate data analysis data visualization package.
 
 [Jupyter Lab Examples]()
 
-[Citations]()
+[Citations](#citations)
 
 # Documentation
 
