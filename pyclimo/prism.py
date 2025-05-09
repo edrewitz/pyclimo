@@ -6,6 +6,8 @@ import cartopy.feature as cfeature
 import numpy as np
 import pandas as pd
 import cmaps
+import warnings
+warnings.filterwarnings('ignore')
 
 from metpy.plots import USCOUNTIES
 from datetime import datetime, timedelta
