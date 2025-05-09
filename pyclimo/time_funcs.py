@@ -1,4 +1,6 @@
 import pytz 
+import warnings
+warnings.filterwarnings('ignore')
 
 try:
     from datetime import datetime, timedelta, UTC
