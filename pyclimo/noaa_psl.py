@@ -79,7 +79,6 @@ def plot_titles(variable, level_type):
             'air':'TEMPERATURE',
             'hgt':'GEOPOTENTIAL HEIGHT',
             'rhum':'RELATIVE HUMIDITY',
-            'shum':'SPECIFIC HUMIDITY',
             'omega':'VERTICAL VELOCITY',
             'uwnd':'U-WIND',
             'vwnd':'V-WIND'
@@ -95,8 +94,7 @@ def plot_titles(variable, level_type):
             'shtfl':'SENSIBLE HEAT FLUX',
             'uwnd':'10-METER U-WIND',
             'vwnd':'10-METER V-WIND',
-            'cfnlf':'CLOUD FORCING NET LONGWAVE FLUX',
-            'pevpr':'SURFACE POTENTIAL EVAPORATION RATE'    
+            'cfnlf':'CLOUD FORCING NET LONGWAVE FLUX',   
         }
 
     if level_type == 'surface' or level_type == 'surface data':
@@ -130,7 +128,6 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
        'air' - Temperature
        'hgt' - Geopotential Height
        'rhum' - Relative Humidity
-       'shum' - Specific Humidity
        'omega' - Vertical Velocity
        'uwnd' - U-Component of Wind
        'vwnd' - V-Component of Wind
@@ -141,7 +138,6 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
        'lhtfl' - Latent Heat Flux
        'shtfl' - Sensible Heat Flux
        'cfnlf' - Cloud Forcing Net Longwave Flux
-       'pevpr' - Surface Potential Evaporation Rate
        'pr_wtr' - Precipitable Water
        'pottmp' - Potential Temperature
        'lftx' - Surface Lifting Index
@@ -158,7 +154,6 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         'air' - Temperature at a specific level
         'hgt' - Geopotential Height at a specific level
         'rhum' - Relative Humidity at a specific level
-        'shum' - Specific Humidity at a specific level
         'omega' - Vertical Velocity at a specific level
         'uwnd' - U-Component of wind at a specific level
         'vwnd' - V-Component of wind at a specific level
@@ -176,7 +171,6 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         'uwnd' - 10-Meter U-Component of Wind
         'vwnd' - 10-Meter V-Component of Wind
         'cfnlf' - Cloud Forcing Net Longwave Flux
-        'pevpr' - Surface Potential Evaporation Rate
 
         iii) 'surface' or 'surface data'
         
@@ -282,7 +276,7 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         southern_bound = southern_bound
         northern_bound = northern_bound
     
-    path, path_print = noaa_psl_directory(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date, 'NCAR Reanalysis')
+    path, path_print = noaa_psl_directory(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date, 'NCAR Reanalysis', level)
 
     ds = get_psl_netcdf(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date)
 
@@ -295,15 +289,18 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
     components = model.components()
     scores = model.scores()
     avg = ds.mean(dim='time')
-    
+
     eof_range = np.nanmax(components[variable]) + abs(np.nanmin(components[variable]))
     rs = -1 * eof_range
     re = eof_range + 0.001
     eof_levels = np.arange(rs, re, 0.001)
-    eof_ticks = eof_levels[::20]
+    if variable == 'prate':
+        eof_ticks = eof_levels[::40]
+    else:
+        eof_ticks = eof_levels[::20]
     eof_cmap = cmaps.eof_colormap_1()
 
-    if variable == 'air':
+    if variable == 'air' or variable == 'skt':
         avg[variable] = avg[variable] - 273.15
         mean_cmap = cmaps.temperature_colormap()
         extend = 'both'
@@ -314,12 +311,36 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
             mean_levels = np.arange(minima, (maxima + 1), 1)
             mean_ticks = mean_levels[::5]
             unit = '[°F]'
+            funit = '[°F]'
         else:
             unit = '[°C]'
+            funit = '[°C]'
             mean_levels = np.arange(np.nanmin(avg[variable]), (np.nanmax(avg[variable])+0.5), 0.5)
             mean_ticks = mean_levels[::5]
     else:
         pass
+
+    if variable == 'pottmp':
+        mean_cmap = cmaps.temperature_colormap()
+        minima = np.nanmin(avg[variable])
+        maxima = np.nanmax(avg[variable])
+        top = maxima + 1
+        mean_levels = np.arange(minima, top, 1)
+        mean_ticks = mean_levels[::5]
+        extend = 'both'
+        unit = '[K]'
+        funit = '[K]'
+
+    if variable == 'lftx':
+        mean_cmap = cmaps.vertical_velocity_colormap()
+        minima = int(round(np.nanmin(avg[variable]),0))
+        maxima = int(round(np.nanmax(avg[variable]),0))
+        top = maxima + 1
+        mean_levels = np.arange(minima, top, 1)
+        mean_ticks = mean_levels[::5]
+        extend = 'both'
+        unit = '[Value]'
+        funit = '[Value]'
 
     if variable == 'rhum':
         mean_cmap = cmaps.relative_humidity_colormap()
@@ -328,6 +349,30 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         mean_ticks = mean_levels[::5]
         extend = 'neither'
         unit = '[%]'
+        funit = '[%]'
+
+    if variable == 'prate':
+        mean_cmap = cmaps.relative_humidity_colormap()
+        eof_cmap = cmaps.eof_colormap_2()
+        avg[variable] = avg[variable] * 3600
+        maxima = np.nanmax(avg[variable])
+        top = maxima + 0.01
+        mean_levels = np.arange(0, top, 0.01)
+        mean_ticks = mean_levels[::5]
+        extend = 'max'
+        unit = '[mm*hr^-1]'
+        funit = '[mmhr^-1]'
+
+    if variable == 'pr_wtr':
+        mean_cmap = cmaps.relative_humidity_colormap()
+        eof_cmap = cmaps.eof_colormap_2()
+        maxima = np.nanmax(avg[variable])
+        top = maxima + 1
+        mean_levels = np.arange(0, top, 1)
+        mean_ticks = mean_levels[::5]
+        extend = 'max'
+        unit = '[mm]'
+        funit = '[mm]'
 
     if variable == 'slp' or variable == 'pres':
         avg[variable] = avg[variable]/100
@@ -337,6 +382,45 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         mean_levels = np.arange(minima, (maxima + 1), 1)
         mean_ticks = mean_levels[::5] 
         unit = '[hPa]'
+        funit = '[hPa]'
+        extend = 'both'
+
+    if variable == 'omega':
+        avg[variable] = avg[variable]
+        mean_cmap = cmaps.vertical_velocity_colormap()
+        minima = round(np.nanmin(avg[variable]), 2)
+        maxima = round(np.nanmax(avg[variable]), 2)
+        mean_levels = np.arange(minima, (maxima + 0.01), 0.01)
+        mean_ticks = mean_levels[::5]
+        unit = '[Pa*s^-1]'
+        funit = '[Pas^-1]'
+        extend = 'both'
+
+    if variable == 'lhtfl' or variable == 'shtfl' or variable == 'cfnlf':
+        avg[variable] = avg[variable]
+        mean_cmap = cmaps.vertical_velocity_colormap()
+        minima = int(round(np.nanmin(avg[variable]), 0))
+        maxima = int(round(np.nanmax(avg[variable]), 0))
+        mean_levels = np.arange(minima, (maxima + 1), 1)
+        if variable == 'lhtfl':
+            mean_ticks = mean_levels[::10]
+        elif variable == 'shtfl':
+            mean_ticks = mean_levels[::20]
+        else:
+            mean_ticks = mean_levels[::5]
+        unit = '[W*m^-2]'
+        funit = '[Wm^-1]'
+        extend = 'both'
+
+    if variable == 'uwnd' or variable == 'vwnd':
+        avg[variable] = avg[variable]
+        mean_cmap = cmaps.vertical_velocity_colormap()
+        minima = int(round(np.nanmin(avg[variable]), 0))
+        maxima = int(round(np.nanmax(avg[variable]), 0))
+        mean_levels = np.arange(minima, (maxima + 1), 1)
+        mean_ticks = mean_levels[::5]
+        unit = '[m*s^-1]'
+        funit = '[ms^-1]'
         extend = 'both'
 
     if variable == 'hgt':
@@ -347,6 +431,7 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         mean_levels = np.arange(minima, (maxima + 1), 1)
         mean_ticks = mean_levels[::5] 
         unit = '[DM]'
+        funit = '[DM]'
         extend = 'both'
 
     title = plot_titles(variable, level_type)
@@ -362,16 +447,16 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         ax.add_feature(cfeature.LAND, color='beige', zorder=1)
         ax.add_feature(cfeature.BORDERS, linestyle='-', zorder=2)
         ax.add_feature(cfeature.OCEAN, color='lightcyan', zorder=1)
-        ax.add_feature(cfeature.LAKES, color='lightcyan', zorder=1)
+        ax.add_feature(cfeature.LAKES, color='black', zorder=1)
         ax.add_feature(provinces, linewidth=1, zorder=2)   
         ax.add_feature(cfeature.STATES, linewidth=0.25, zorder=2)
     
         if i == 0:
             if level_type == 'pressure' or level_type == 'pressure level':
-                fname = f"MEAN {level} MB {title} {unit}.png"
+                fname = f"MEAN {level} MB {title} {funit}.png"
                 plt.title(f"MEAN {level} MB {title} {unit}", fontsize=8, fontweight='bold', loc='left')
             else:
-                fname = f"MEAN {title} {unit}.png"
+                fname = f"MEAN {title} {funit}.png"
                 plt.title(f"MEAN {title} {unit}", fontsize=8, fontweight='bold', loc='left')
             plt.title(f"PERIOD OF RECORD: {start_date} - {end_date}", fontsize=7, fontweight='bold', loc='right')
             ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
@@ -386,11 +471,11 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
             print(f"Saved {fname} to {path_print}")   
         if i == 1:
             if level_type == 'pressure' or level_type == 'pressure level':
-                fname = f"EOF1 {level} MB {title} {unit}.png"
-                plt.title(f"EOF1 {level} MB {title} {unit}", fontsize=8, fontweight='bold', loc='left')
+                fname = f"EOF1 {level} MB {title}.png"
+                plt.title(f"EOF1 {level} MB {title}", fontsize=8, fontweight='bold', loc='left')
             else:
-                fname = f"EOF1 {title} {unit}.png"
-                plt.title(f"EOF1 {title} {unit}", fontsize=8, fontweight='bold', loc='left')
+                fname = f"EOF1 {title}.png"
+                plt.title(f"EOF1 {title}", fontsize=8, fontweight='bold', loc='left')
             plt.title(f"PERIOD OF RECORD: {start_date} - {end_date}", fontsize=7, fontweight='bold', loc='right')
             ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
             ax.text(x2, y2, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
@@ -404,11 +489,11 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
             print(f"Saved {fname} to {path_print}")   
         if i == 2:
             if level_type == 'pressure' or level_type == 'pressure level':
-                fname = f"EOF2 {level} MB {title} {unit}.png"
-                plt.title(f"EOF2 {level} MB {title} {unit}", fontsize=8, fontweight='bold', loc='left')
+                fname = f"EOF2 {level} MB {title}.png"
+                plt.title(f"EOF2 {level} MB {title}", fontsize=8, fontweight='bold', loc='left')
             else:
-                fname = f"EOF2 {title} {unit}.png"
-                plt.title(f"EOF2 {title} {unit}", fontsize=8, fontweight='bold', loc='left')
+                fname = f"EOF2 {title}.png"
+                plt.title(f"EOF2 {title}", fontsize=8, fontweight='bold', loc='left')
             plt.title(f"PERIOD OF RECORD: {start_date} - {end_date}", fontsize=7, fontweight='bold', loc='right')
             ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
             ax.text(x2, y2, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
@@ -437,7 +522,7 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
 
         ax.plot(scores['time'], scores[i, :], color='black')
 
-        if variable == 'rhum':
+        if variable == 'rhum' or variable == 'prate' or variable == 'pr_wtr':
             c1 = 'lime'
             c2 = 'saddlebrown'
         else:
