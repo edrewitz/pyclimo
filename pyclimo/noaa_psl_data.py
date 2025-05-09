@@ -31,7 +31,6 @@ def get_variable_paths(variable, level_type):
         'air':['pressure', 'air.nc'],
         'hgt':['pressure', 'hgt.nc'],
         'rhum':['pressure', 'rhum.nc'],
-        'shum':['pressure', 'shum.nc'],
         'omega':['pressure', 'omega.nc'],
         'uwnd':['pressure', 'uwnd.nc'],
         'vwnd':['pressure', 'vwnd.nc']
@@ -80,7 +79,6 @@ def get_psl_netcdf(variable, level_type, western_bound, eastern_bound, southern_
        'air' - Temperature
        'hgt' - Geopotential Height
        'rhum' - Relative Humidity
-       'shum' - Specific Humidity
        'omega' - Vertical Velocity
        'uwnd' - U-Component of Wind
        'vwnd' - V-Component of Wind
@@ -91,7 +89,6 @@ def get_psl_netcdf(variable, level_type, western_bound, eastern_bound, southern_
        'lhtfl' - Latent Heat Flux
        'shtfl' - Sensible Heat Flux
        'cfnlf' - Cloud Forcing Net Longwave Flux
-       'pevpr' - Surface Potential Evaporation Rate
        'pr_wtr' - Precipitable Water
        'pottmp' - Potential Temperature
        'lftx' - Surface Lifting Index
@@ -108,7 +105,6 @@ def get_psl_netcdf(variable, level_type, western_bound, eastern_bound, southern_
         'air' - Temperature at a specific level
         'hgt' - Geopotential Height at a specific level
         'rhum' - Relative Humidity at a specific level
-        'shum' - Specific Humidity at a specific level
         'omega' - Vertical Velocity at a specific level
         'uwnd' - U-Component of wind at a specific level
         'vwnd' - V-Component of wind at a specific level
@@ -126,7 +122,6 @@ def get_psl_netcdf(variable, level_type, western_bound, eastern_bound, southern_
         'uwnd' - 10-Meter U-Component of Wind
         'vwnd' - 10-Meter V-Component of Wind
         'cfnlf' - Cloud Forcing Net Longwave Flux
-        'pevpr' - Surface Potential Evaporation Rate
 
         iii) 'surface' or 'surface data'
         
