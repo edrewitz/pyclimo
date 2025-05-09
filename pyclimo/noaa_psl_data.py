@@ -8,6 +8,9 @@ import xarray as xr
 import requests
 import sys
 
+import warnings
+warnings.filterwarnings('ignore')
+
 from datetime import datetime, timedelta
 
 def shift_longitude(ds, lon_name='lon'):
