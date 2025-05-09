@@ -5,6 +5,8 @@ This file holds the functions that perform calculations.
 """
 import math
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
 def mm_to_in(mm):
 
