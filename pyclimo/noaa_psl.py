@@ -12,6 +12,8 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import numpy as np
 import cmaps
+import warnings
+warnings.filterwarnings('ignore')
 
 from dateutil import tz
 from time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
