@@ -1,4 +1,11 @@
+"""
+This file hosts the coordinates for the different regions in the United States. 
 
+(C) Meteorologist Eric J. Drewitz
+"""
+
+import warnings
+warnings.filterwarnings('ignore')
 
 def get_cwa_coords(cwa):
 
