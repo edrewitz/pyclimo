@@ -41,7 +41,7 @@ def extract_zipped_files(file_path, extraction_folder):
     zObject.close()
 
 
-def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_in_folder):
+def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_in_folder, to_fahrenheit):
 
     """
     This function does the following actions:
@@ -84,6 +84,8 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
 
     Returns: A Pandas DataFrame of PRISM Climate Data
     """
+    variable = variable.lower()
+    normal_type = normal_type.lower()
 
     if os.path.exists(f"PRISM Data"):
         pass
@@ -97,10 +99,10 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
         pass
 
     if dtype == 'Daily' or dtype == 'daily':
-        url_data = f"https://data.prism.oregonstate.edu/time_series/us/an/4km/{variable.lower()}/daily/{year}"
+        url_data = f"https://data.prism.oregonstate.edu/time_series/us/an/4km/{variable}/daily/{year}"
 
-        fname_data = f"prism_{variable.lower()}_us_25m_{year}{month}{day}.zip"
-        geotif_data = f"prism_{variable.lower()}_us_25m_{year}{month}{day}.tif"
+        fname_data = f"prism_{variable}_us_25m_{year}{month}{day}.zip"
+        geotif_data = f"prism_{variable}_us_25m_{year}{month}{day}.tif"
 
         urllib.request.urlretrieve(f"{url_data}/{fname_data}", f"{fname_data}")
     
@@ -112,16 +114,16 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
         df_data = data.to_pandas()
 
         df_data = df_data.loc[:,['value', 'x', 'y']]
-        df_data = df_data.rename(columns={f'value':f'{variable.lower()}', f'x':f'longitude', f'y':f'latitude'})
+        df_data = df_data.rename(columns={f'value':f'{variable}', f'x':f'longitude', f'y':f'latitude'})
 
         df = pd.DataFrame()
         df = df_data
 
     if dtype == 'Monthly' or dtype == 'monthly':
-        url_data = f"https://data.prism.oregonstate.edu/time_series/us/an/4km/{variable.lower()}/monthly/{year}"
+        url_data = f"https://data.prism.oregonstate.edu/time_series/us/an/4km/{variable}/monthly/{year}"
         
-        fname_data = f"prism_{variable.lower()}_us_25m_{year}{month}.zip"
-        geotif_data = f"prism_{variable.lower()}_us_25m_{year}{month}.tif"
+        fname_data = f"prism_{variable}_us_25m_{year}{month}.zip"
+        geotif_data = f"prism_{variable}_us_25m_{year}{month}.tif"
 
         urllib.request.urlretrieve(f"{url_data}/{fname_data}", f"{fname_data}")
     
@@ -143,11 +145,11 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
         url = f"https://data.prism.oregonstate.edu/normals/us/4km/{variable.lower()}/{normal_type.lower()}"
 
         if normal_type == 'Monthly' or normal_type == 'monthly':
-            fname = f"prism_{variable.lower()}_us_25m_2020{month}_avg_30y.zip"
-            geotif = f"prism_{variable.lower()}_us_25m_2020{month}_avg_30y.tif"
+            fname = f"prism_{variable}_us_25m_2020{month}_avg_30y.zip"
+            geotif = f"prism_{variable}_us_25m_2020{month}_avg_30y.tif"
         if normal_type == 'Daily' or normal_type == 'daily':
-            fname = f"prism_{variable.lower()}_us_25m_2020{month}{day}_avg_30y.zip"
-            geotif = f"prism_{variable.lower()}_us_25m_2020{month}{day}_avg_30y.tif"
+            fname = f"prism_{variable}_us_25m_2020{month}{day}_avg_30y.zip"
+            geotif = f"prism_{variable}_us_25m_2020{month}{day}_avg_30y.tif"
 
         urllib.request.urlretrieve(f"{url}/{fname}", f"{fname}")
     
@@ -160,7 +162,13 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
 
         df = df.loc[:,['value', 'x', 'y']]
 
-        df = df.rename(columns={f'value':f'{variable.lower()}', f'x':f'longitude', f'y':f'latitude'})
+        df = df.rename(columns={f'value':f'{variable}', f'x':f'longitude', f'y':f'latitude'})
+
+    if variable == 'tmax' or variable == 'tmin' or variable == 'tdmean' or variable == 'tmin':
+        if to_fahrenheit == True:
+            df[variable] = celsius_to_fahrenheit(df[variable])
+        else:
+            pass
 
     return df
 
