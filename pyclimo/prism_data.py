@@ -18,7 +18,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from zipfile import ZipFile
-from calc import celsius_to_fahrenheit
+from calc import celsius_to_fahrenheit, mm_to_in
 
 def extract_zipped_files(file_path, extraction_folder):
 
@@ -41,7 +41,7 @@ def extract_zipped_files(file_path, extraction_folder):
     zObject.close()
 
 
-def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_in_folder, to_fahrenheit):
+def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_in_folder, to_fahrenheit, to_inches):
 
     """
     This function does the following actions:
@@ -81,6 +81,12 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
 
     7) clear_data_in_folder (Boolean) - When set to True, the user will clear all old data in the f:PRISM Data folder. 
        When set to False, the old data will remain un-touched and archived in the f:PRISM Data folder. 
+
+    8) to_fahrenheit (Boolean) - When set to True, if the user is plotting a temperature based parameter, the values will convert to Fahrenheit. 
+       When set to False, the values will remain in Celsius. 
+
+    9) to_inches (Boolean) - When set to True, if the user is plotting precipitation, the values will convert to inches. 
+       When set to False, the values will remain in mm. 
 
     Returns: A Pandas DataFrame of PRISM Climate Data
     """
@@ -167,6 +173,12 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
     if variable == 'tmax' or variable == 'tmin' or variable == 'tdmean' or variable == 'tmin':
         if to_fahrenheit == True:
             df[variable] = celsius_to_fahrenheit(df[variable])
+        else:
+            pass
+            
+    if variable == 'ppt':
+        if to_inches == True:
+            df[variable] = mm_to_in(df[variable])
         else:
             pass
 
