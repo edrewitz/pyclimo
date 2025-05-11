@@ -17,7 +17,7 @@ from dateutil import tz
 from time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
 from coords import get_cwa_coords, get_region_info
 from prism_data import get_geotiff_data
-from calc import celsius_to_fahrenheit, roundup, rounddown, mm_to_in
+from calc import roundup, rounddown, round_to_quarter
 
 mpl.rcParams['font.weight'] = 'bold'
 props = dict(boxstyle='round', facecolor='wheat', alpha=1)
@@ -38,7 +38,7 @@ from_zone = tz.tzutc()
 to_zone = tz.tzlocal()
 
 
-def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type, resolution='4km', clear_data_in_folder=True, western_bound=None, eastern_bound=None, southern_bound=None, northern_bound=None, reference_system='States & Counties', show_state_borders=False, show_county_borders=False, show_gacc_borders=False, show_psa_borders=False, show_cwa_borders=False, show_nws_firewx_zones=False, show_nws_public_zones=False, state_border_linewidth=1, county_border_linewidth=0.25, gacc_border_linewidth=1, psa_border_linewidth=0.5, cwa_border_linewidth=1, nws_firewx_zones_linewidth=0.25, nws_public_zones_linewidth=0.25, state_border_linestyle='-', county_border_linestyle='-', gacc_border_linestyle='-', psa_border_linestyle='-', cwa_border_linestyle='-', nws_firewx_zones_linestyle='-', nws_public_zones_linestyle='-', region='conus', x1=0.01, y1=-0.03, x2=0.725, y2=-0.025, x3=0.01, y3=0.01, cwa=None, signature_fontsize=6, stamp_fontsize=5, shrink=0.7, plot_anomaly = False):
+def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_in_folder=True, to_fahrenheit=True, to_inches=True, western_bound=None, eastern_bound=None, southern_bound=None, northern_bound=None, reference_system='States & Counties', show_state_borders=False, show_county_borders=False, show_gacc_borders=False, show_psa_borders=False, show_cwa_borders=False, show_nws_firewx_zones=False, show_nws_public_zones=False, state_border_linewidth=1, county_border_linewidth=0.25, gacc_border_linewidth=1, psa_border_linewidth=0.5, cwa_border_linewidth=1, nws_firewx_zones_linewidth=0.25, nws_public_zones_linewidth=0.25, state_border_linestyle='-', county_border_linestyle='-', gacc_border_linestyle='-', psa_border_linestyle='-', cwa_border_linestyle='-', nws_firewx_zones_linestyle='-', nws_public_zones_linestyle='-', region='conus', x1=0.01, y1=-0.03, x2=0.725, y2=-0.025, x3=0.01, y3=0.01, cwa=None, signature_fontsize=6, stamp_fontsize=5, shrink=0.7):
 
     """
     This function downloads and plots PRISM Climate Data and saves the graphics to a folder. 
@@ -51,9 +51,7 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
        - Monthly = Monthly Data
        - Normals = 30-Year Climate Normals
 
-    2) data_region (String) - Either 'us' for the CONUS or 'ak' for Alaska
-
-    3) variable (String) - The variable to analyze. 
+    2) variable (String) - The variable to analyze. 
     
        Universal Variables:
        - ppt = Daily [monthly] total precipitation (rain+melted snow) 
@@ -63,7 +61,6 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
        - tmin = Daily minimum temperature [averaged over all days in the month]
        - vpdmax = Daily maximum vapor pressure deficit [averaged over all days in the month] 
        - vpdmin = Daily minimum vapor pressure deficit [averaged over all days in the month] 
-       - rhmean = Mean Relative Humidity calculated from tmean and tdmean
        
        Additional Variables For Normals Only at 800m resolution:
        - solclear = Total daily global shortwave solar radiation received on a horizontal surface under clear sky conditions [averaged over all days in the month] 
@@ -71,50 +68,53 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
        - soltotal = Total daily global shortwave solar radiation received on a horizontal surface [averaged over all days in the month] 
        - soltrans = Atmospheric transmittance (cloudiness) [monthly average daily soltotal/monthly average daily solclear]
 
-    4) year (String) - Year
+    3) year (String) - Year
        Daily Data goes back to 1981
        Monthly Data goes back to 1895
 
-    5) month (String) - 2 digit abbreviation for month (MM)
+    4) month (String) - 2 digit abbreviation for month (MM)
 
-    6) day (String) - For daily data only - 2 digit abbreviation for day (DD)
+    5) day (String) - For daily data only - 2 digit abbreviation for day (DD)
        If the user wants to use monthly data instead of daily data, pass a value of None for the variable day. 
 
-    7) normal_type (String) - Daily or Monthly normals.
+    6) normal_type (String) - Daily or Monthly normals.
 
     Optional Arguments:
 
-    1) resolution (String) - Default='4km' - 4km or 800m. 800m takes much longer to convert to a Pandas DataFrame due to a much larger file size.
-       However, there is a large increase in resolution. 
-
-    2) clear_data_in_folder (Boolean) - Default=True - When set to True, the user will clear all old data in the f:PRISM Data folder. 
+    1) clear_data_in_folder (Boolean) - Default=True - When set to True, the user will clear all old data in the f:PRISM Data folder. 
        When set to False, the old data will remain un-touched and archived in the f:PRISM Data folder. 
 
-    3) western_bound (Integer or Float) - Default = None. Western extent of the plot in decimal degrees. 
+    2) to_fahrenheit (Boolean) - Default = True. When set to True, if the user is plotting a temperature based parameter, the values will convert to Fahrenheit. 
+       When set to False, the values will remain in Celsius. 
+
+    3) to_inches (Boolean) - Default = True. When set to True, if the user is plotting precipitation, the values will convert to inches. 
+       When set to False, the values will remain in mm. 
+
+    4) western_bound (Integer or Float) - Default = None. Western extent of the plot in decimal degrees. 
        The default setting is None. If set to None, the user must select a state or gacc_region. 
        This setting should be changed from None to an integer or float value if the user wishes to
        have a custom area selected. Negative values denote the western hemisphere and positive 
        values denote the eastern hemisphere. 
 
-    4) eastern_bound (Integer or Float) - Default = None. Eastern extent of the plot in decimal degrees. 
+    5) eastern_bound (Integer or Float) - Default = None. Eastern extent of the plot in decimal degrees. 
        The default setting is None. If set to None, the user must select a state or gacc_region. 
        This setting should be changed from None to an integer or float value if the user wishes to
        have a custom area selected. Negative values denote the western hemisphere and positive 
        values denote the eastern hemisphere. 
 
-    5) southern_bound (Integer or Float) - Default = None. Southern extent of the plot in decimal degrees. 
+    6) southern_bound (Integer or Float) - Default = None. Southern extent of the plot in decimal degrees. 
        The default setting is None. If set to None, the user must select a state or gacc_region. 
        This setting should be changed from None to an integer or float value if the user wishes to
        have a custom area selected. Positive values denote the northern hemisphere and negative 
        values denote the southern hemisphere. 
 
-    6) northern_bound (Integer or Float) - Default = None. Northern extent of the plot in decimal degrees. 
+    7) northern_bound (Integer or Float) - Default = None. Northern extent of the plot in decimal degrees. 
        The default setting is None. If set to None, the user must select a state or gacc_region. 
        This setting should be changed from None to an integer or float value if the user wishes to
        have a custom area selected. Positive values denote the northern hemisphere and negative 
        values denote the southern hemisphere.
 
-    7) reference_system (String) - Default = 'States & Counties'. The georgraphical reference system with respect to the borders on the map. If the user
+    8) reference_system (String) - Default = 'States & Counties'. The georgraphical reference system with respect to the borders on the map. If the user
         wishes to use a reference system not on this list, please see items 8-14. 
         Reference Systems:
 
@@ -133,57 +133,57 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
         13) 'GACC & Counties'
                            
 
-    8) show_state_borders (Boolean) - If set to True, state borders will display. If set to False, state borders will not display. 
+    9) show_state_borders (Boolean) - If set to True, state borders will display. If set to False, state borders will not display. 
         Default setting is False. Users should change this value to False if they wish to hide state borders. 
 
-    9) show_county_borders (Boolean) - If set to True, county borders will display. If set to False, county borders will not display. 
+    10) show_county_borders (Boolean) - If set to True, county borders will display. If set to False, county borders will not display. 
         Default setting is False. Users should change this value to False if they wish to hide county borders. 
 
-    10) show_gacc_borders (Boolean) - If set to True, GACC (Geographic Area Coordination Center) borders will display. If set to False, GACC borders will not display. 
+    11) show_gacc_borders (Boolean) - If set to True, GACC (Geographic Area Coordination Center) borders will display. If set to False, GACC borders will not display. 
         Default setting is False. Users should change this value to True if they wish to display GACC borders. 
 
-    11) show_psa_borders (Boolean) - If set to True, PSA (Predictive Services Area) borders will display. If set to False, PSA borders will not display. 
+    12) show_psa_borders (Boolean) - If set to True, PSA (Predictive Services Area) borders will display. If set to False, PSA borders will not display. 
         Default setting is False. Users should change this value to True if they wish to display PSA borders.
 
-    12) show_cwa_borders (Boolean) - If set to True, CWA borders will display. If set to False, CWA borders will not display. 
+    13) show_cwa_borders (Boolean) - If set to True, CWA borders will display. If set to False, CWA borders will not display. 
         Default setting is False. Users should change this value to True if they wish to display CWA borders.
 
-    13) show_nws_firewx_zones (Boolean) - If set to True, NWS FWZ borders will display. If set to False, NWS FWZ borders will not display. 
+    14) show_nws_firewx_zones (Boolean) - If set to True, NWS FWZ borders will display. If set to False, NWS FWZ borders will not display. 
         Default setting is False. Users should change this value to True if they wish to display NWS FWZ borders.
 
-    14) show_nws_public_zones (Boolean) - If set to True, NWS Public Zone borders will display. If set to False, NWS Public Zone borders will not display. 
+    15) show_nws_public_zones (Boolean) - If set to True, NWS Public Zone borders will display. If set to False, NWS Public Zone borders will not display. 
         Default setting is False. Users should change this value to True if they wish to display NWS Public Zone borders.
 
-    15) state_border_linewidth (Integer) - Linewidth (thickness) of the state borders. Default setting is 2. 
+    16) state_border_linewidth (Integer) - Linewidth (thickness) of the state borders. Default setting is 2. 
 
-    16) county_border_linewidth (Integer) - Linewidth (thickness) of the county borders. Default setting is 1. 
+    17) county_border_linewidth (Integer) - Linewidth (thickness) of the county borders. Default setting is 1. 
 
-    17) gacc_border_linewidth (Integer) - Linewidth (thickness) of the GACC borders. Default setting is 2. 
+    18) gacc_border_linewidth (Integer) - Linewidth (thickness) of the GACC borders. Default setting is 2. 
 
-    18) psa_border_linewidth (Integer) - Linewidth (thickness) of the PSA borders. Default setting is 1. 
+    19) psa_border_linewidth (Integer) - Linewidth (thickness) of the PSA borders. Default setting is 1. 
 
-    19) state_border_linestyle (String) - Linestyle of the state borders. Default is a solid line. 
+    20) state_border_linestyle (String) - Linestyle of the state borders. Default is a solid line. 
         To change to a dashed line, users should set state_border_linestyle='--'. 
 
-    20) county_border_linestyle (String) - Linestyle of the county borders. Default is a solid line. 
+    21) county_border_linestyle (String) - Linestyle of the county borders. Default is a solid line. 
         To change to a dashed line, users should set county_border_linestyle='--'. 
 
-    21) gacc_border_linestyle (String) - Linestyle of the GACC borders. Default is a solid line. 
+    22) gacc_border_linestyle (String) - Linestyle of the GACC borders. Default is a solid line. 
         To change to a dashed line, users should set gacc_border_linestyle='--'. 
 
-    22) psa_border_linestyle (String) - Linestyle of the PSA borders. Default is a solid line. 
+    23) psa_border_linestyle (String) - Linestyle of the PSA borders. Default is a solid line. 
         To change to a dashed line, users should set psa_border_linestyle='--'. 
 
-    23) cwa_border_linestyle (String) - Linestyle of the CWA borders. Default is a solid line. 
+    24) cwa_border_linestyle (String) - Linestyle of the CWA borders. Default is a solid line. 
         To change to a dashed line, users should set psa_border_linestyle='--'. 
 
-    24) nws_firewx_zones_linestyle (String) - Linestyle of the NWS FWZ borders. Default is a solid line. 
+    25) nws_firewx_zones_linestyle (String) - Linestyle of the NWS FWZ borders. Default is a solid line. 
         To change to a dashed line, users should set psa_border_linestyle='--'. 
 
-    25) nws_public_zones_linestyle (String) - Linestyle of the NWS Public Zone borders. Default is a solid line. 
+    26) nws_public_zones_linestyle (String) - Linestyle of the NWS Public Zone borders. Default is a solid line. 
         To change to a dashed line, users should set psa_border_linestyle='--'. 
 
-    26) region (String) - The two letter state abbreviation or four letter GACC Region abbreviation for the region the user wishes to make the graphic for. 
+    27) region (String) - The two letter state abbreviation or four letter GACC Region abbreviation for the region the user wishes to make the graphic for. 
         If the user wishes to make a graphic for the entire CONUS, there are 4 acceptable abbreviations: 'US' or 'us'
         or 'USA' or 'usa'. Example: If the user wishes to make a plot for the state of California both 'CA' or 'ca' are
         acceptable. Default setting is 'us'. If the user wishes to make a plot based on gacc_region, this value must be 
@@ -211,19 +211,19 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
         
         Alaska: Setting state='AK' or state='ak' suffices here. Leave gacc_region=None and set the state variable as shown. 
 
-    27) x1 (Float) - Default = 0.01. The x-position of the signature text box with respect to the axis of the image. 
+    28) x1 (Float) - Default = 0.01. The x-position of the signature text box with respect to the axis of the image. 
 
-    28) y1 (Float) - Default = -0.03. The y-position of the signature text box with respect to the axis of the image. 
+    29) y1 (Float) - Default = -0.03. The y-position of the signature text box with respect to the axis of the image. 
 
-    29) x2 (Float) - Default = 0.725. The x-position of the timestamp text box with respect to the axis of the image.
+    30) x2 (Float) - Default = 0.725. The x-position of the timestamp text box with respect to the axis of the image.
 
-    30) y2 (Float) - Default = -0.025. The y-position of the timestamp text box with respect to the axis of the image.
+    31) y2 (Float) - Default = -0.025. The y-position of the timestamp text box with respect to the axis of the image.
 
-    31) x3 (Float) - Default = 0.01. The x-position of the reference system text box with respect to the axis of the image.
+    32) x3 (Float) - Default = 0.01. The x-position of the reference system text box with respect to the axis of the image.
 
-    32) y3 (Float) - Default = 0.01. The y-position of the reference system text box with respect to the axis of the image.
+    33) y3 (Float) - Default = 0.01. The y-position of the reference system text box with respect to the axis of the image.
 
-    33) cwa (String) - *For Alaska only* - The 3-letter abbreviation for the National Weather Service CWA. 
+    34) cwa (String) - *For Alaska only* - The 3-letter abbreviation for the National Weather Service CWA. 
         For a view of the entire state - set cwa=None. 
 
         NWS CWA Abbreviations:
@@ -236,11 +236,11 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
         
         4) AFG - NWS Fairbanks        
 
-    34) signature_fontsize (Integer) - Default = 6. The fontsize of the signature. This is only to be changed when making a custom plot. 
+    35) signature_fontsize (Integer) - Default = 6. The fontsize of the signature. This is only to be changed when making a custom plot. 
 
-    35) stamp_fontsize (Integer) - Default = 5. The fontsize of the timestamp and reference system text. This is only to be changed when making a custom plot. 
+    36) stamp_fontsize (Integer) - Default = 5. The fontsize of the timestamp and reference system text. This is only to be changed when making a custom plot. 
 
-    36) shrink (Integer or Float) - Default = 0.7. This is how the colorbar is sized to the figure. 
+    37) shrink (Integer or Float) - Default = 0.7. This is how the colorbar is sized to the figure. 
             This is a feature of matplotlib, as per their definition, the shrink is:
             "Fraction by which to multiply the size of the colorbar." 
             This should only be changed if the user wishes to change the size of the colorbar. 
@@ -378,12 +378,9 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
             if region == 'CONUS' or region == 'conus':
                 county_border_linewidth=0.25   
 
-    path, path_print = prism_file_directory(dtype, region, variable, year, month, day, resolution, normal_type, reference_system)
+    path, path_print = prism_file_directory(dtype, 'us', variable, year, month, day, '4km', normal_type, reference_system)
 
-    if plot_anomaly == False:
-        fname = f"{variable.upper()}.png"
-    else:
-        fname = f"{variable.upper()} Anomaly.png"
+    fname = f"{variable.upper()}.png"
 
     try:
         western_bound, eastern_bound, southern_bound, northern_bound, x1, y1, x2, y2, x3, y3, signature_fontsize, stamp_fontsize, shrink = get_region_info(region)
@@ -408,7 +405,7 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
         y3=y3
         shrink=shrink
 
-    df = get_geotiff_data(dtype, data_region, variable, year, month, day, resolution, normal_type, clear_data_in_folder, plot_anomaly)
+    df = get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_in_folder, to_fahrenheit, to_inches)
 
     df = df[df['longitude'] <= eastern_bound] 
     df = df[df['longitude'] >= western_bound] 
@@ -420,27 +417,19 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
     var = df[variable]
 
     if variable == 'tmax' or variable == 'tmean' or variable == 'tmin':
-        if plot_anomaly == False:
-            cmap = cmaps.temperature_colormap()
-            var = celsius_to_fahrenheit(var)
-            vmin = int(round(np.nanmin(var),0))
-            vmax = int(round(np.nanmax(var),0))
-            levels = np.arange(rounddown(vmin), (roundup(vmax) + 1), 1)
-            if vmin >= 0:
-                variance = vmax - vmin
-            else:
-                variance = vmax + vmin
-            if variance >= 30:
-                ticks = levels[::5]
-            elif variance >= 15 and variance < 30:
-                ticks = levels[::5]
-            else:
-                ticks = levels[::5]
+        cmap = cmaps.temperature_colormap()
+        vmin = int(round(np.nanmin(var),0))
+        vmax = int(round(np.nanmax(var),0))
+        levels = np.arange(rounddown(vmin), (roundup(vmax) + 1), 1)
+        if vmin >= 0:
+            variance = vmax - vmin
         else:
-            cmap = cmaps.temperature_change_colormap()
-            vmin = int(round(np.nanmin(var),0))
-            vmax = int(round(np.nanmax(var),0))
-            levels = np.arange(rounddown(vmin), (roundup(vmax) + 1), 1)
+            variance = vmax + vmin
+        if variance >= 30:
+            ticks = levels[::5]
+        elif variance >= 15 and variance < 30:
+            ticks = levels[::5]
+        else:
             ticks = levels[::5]
 
         if variable == 'tmax':
@@ -450,25 +439,26 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
         if variable == 'tmin':
             title_var = 'Minimum Temperature'
         if dtype == 'Normals' or dtype == 'normals':
-            title_left = f"{normal_type.upper()} {title_var.upper()} [°F] 30-Year (1991-2020) Normal"
+            if to_fahrenheit == True:
+                title_left = f"{normal_type.upper()} {title_var.upper()} [°F] 30-Year (1991-2020) Normal"
+            else:
+                title_left = f"{normal_type.upper()} {title_var.upper()} [°C] 30-Year (1991-2020) Normal"
             if normal_type == 'Daily' or normal_type == 'daily':
                 title_right = f"Valid: {mon}-{day}"
             if normal_type == 'Monthly' or normal_type == 'monthly':
                 title_right = f"Valid: {mon}"
         if dtype == 'Daily' or dtype == 'daily':
-            if plot_anomaly == False:
+            if to_fahrenheit == True:
                 title_left = f"{title_var.upper()} [°F]"
-                title_right = f"Valid: {year}-{mon}-{day}"
             else:
-                title_left = f"{title_var.upper()} ANOMALY [°C] (Based on a 1991-2020 Climatology)"
-                title_right = f"Valid: {year}-{mon}-{day}"                
+                title_left = f"{title_var.upper()} [°C]"
+            title_right = f"Valid: {year}-{mon}-{day}"              
         if dtype == 'Monthly' or dtype == 'monthly':
-            if plot_anomaly == False:
+            if to_fahrenheit == True:
                 title_left = f"{title_var.upper()} [°F]"
-                title_right = f"Valid: {year}-{mon}" 
             else:
-                title_left = f"{title_var.upper()} ANOMALY [°C] (Based on a 1991-2020 Climatology)"
-                title_right = f"Valid: {year}-{mon}" 
+                title_left = f"{title_var.upper()} [°C]"
+            title_right = f"Valid: {year}-{mon}" 
                 
     elif variable == 'tdmean':
         var = celsius_to_fahrenheit(var)
@@ -483,43 +473,78 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
             ticks = levels[::1]
         title_var = 'Mean Dew Point Temperature'
         if dtype == 'Daily' or dtype == 'daily':
-            title_left = f"{title_var.upper()} [°F]"
+            if to_fahrenheit == True:
+                title_left = f"{title_var.upper()} [°F]"
+            else:
+                title_left = f"{title_var.upper()} [°C]"
             title_right = f"Valid: {year}-{mon}-{day}"               
         if dtype == 'Monthly' or dtype == 'monthly':
-            title_left = f"{title_var.upper()} [°F]"
+            if to_fahrenheit == True:
+                title_left = f"{title_var.upper()} [°F]"
+            else:
+                title_left = f"{title_var.upper()} [°C]"
             title_right = f"Valid: {year}-{mon}" 
         if dtype == 'Normals' or dtype == 'normals':
-            title_left = f"{normal_type.upper()} {title_var.upper()} [°F] 30-Year (1991-2020) Normal"
-            if normal_type == 'Daily' or normal_type == 'daily':
-                title_right = f"Valid: {mon}-{day}"
-            if normal_type == 'Monthly' or normal_type == 'monthly':
-                title_right = f"Valid: {mon}"
-    elif variable == 'rhmean':
-        cmap = cmaps.relative_humidity_colormap()
-        levels = np.arange(0, 101, 1)
-        vmin = 0
-        vmax = 100
-        ticks = levels[::5]
-        title_var = 'Mean Relative Humidity'
-        if dtype == 'Normals' or dtype == 'normals':
-            title_left = f"{normal_type.upper()} {title_var.upper()} [%] 30-Year (1991-2020) Normal"
+            if to_fahrenheit == True:
+                title_left = f"{normal_type.upper()} {title_var.upper()} [°F] 30-Year (1991-2020) Normal"
+            else:
+                title_left = f"{normal_type.upper()} {title_var.upper()} [°C] 30-Year (1991-2020) Normal"
             if normal_type == 'Daily' or normal_type == 'daily':
                 title_right = f"Valid: {mon}-{day}"
             if normal_type == 'Monthly' or normal_type == 'monthly':
                 title_right = f"Valid: {mon}"
 
     elif variable == 'ppt':
-        cmap = cmaps.precipitation_anomaly_colormap()
+        cmap = cmaps.precipitation_colormap()
+        vmin = 0
+        vmax = int(round_to_quarter(np.nanmax(var)))
+        levels = np.arange(vmin, (vmax + 0.01), 0.01)
+        ticks = levels[::100]
+        title_var = 'Total Precipitation'
+        if dtype == 'Daily' or dtype == 'daily':
+            if to_inches == True:
+                title_left = f"{title_var.upper()} [IN]"
+            else:
+                title_left = f"{title_var.upper()} [MM]"
+            title_right = f"Valid: {year}-{mon}-{day}"               
         if dtype == 'Monthly' or dtype == 'monthly':
-            if plot_anomaly == True:
-                levels = np.arange(0, 201, 1)
-                vmin = 0
-                vmax = 200
-                ticks = levels[::10]
-                title_var = 'Percent of Monthly Normal Precipitation'
-                title_left = f"{title_var.upper()} BASED ON 30-YEAR(1991-2020) NORMAL"
-                title_right = f"Valid: {mon}{year}"
-            
+            if to_inches == True:
+                title_left = f"{title_var.upper()} [IN]"
+            else:
+                title_left = f"{title_var.upper()} [MM]"
+            title_right = f"Valid: {year}-{mon}" 
+        if dtype == 'Normals' or dtype == 'normals':
+            if to_inches == True:
+                title_left = f"{normal_type.upper()} {title_var.upper()} [IN] 30-Year (1991-2020) Normal"
+            else:
+                title_left = f"{normal_type.upper()} {title_var.upper()} [MM] 30-Year (1991-2020) Normal"
+            if normal_type == 'Daily' or normal_type == 'daily':
+                title_right = f"Valid: {mon}-{day}"
+            if normal_type == 'Monthly' or normal_type == 'monthly':
+                title_right = f"Valid: {mon}"
+
+    elif variable == 'vpdmax' or variable == 'vpdmin':
+        cmap = cmaps.vapor_pressure_deficit_colormap()
+        vmin = int(round(np.nanmin(var),0))
+        vmax = int(round(np.nanmax(var),0))
+        levels = np.arange(vmin, (vmax + 1), 1)
+        ticks = levels[::10]
+        if variable == 'vpdmax':
+            title_var = 'Maximum Vapor Pressure Deficit'
+        if variable == 'vpdmin':
+            title_var = 'Minimum Vapor Pressure Deficit'
+        if dtype == 'Daily' or dtype == 'daily':
+            title_left = f"{title_var.upper()} [hPa]"
+            title_right = f"Valid: {year}-{mon}-{day}"               
+        if dtype == 'Monthly' or dtype == 'monthly':
+            title_left = f"{title_var.upper()} [hPa]"
+            title_right = f"Valid: {year}-{mon}" 
+        if dtype == 'Normals' or dtype == 'normals':
+            title_left = f"{normal_type.upper()} {title_var.upper()} [hPa] 30-Year (1991-2020) Normal"
+            if normal_type == 'Daily' or normal_type == 'daily':
+                title_right = f"Valid: {mon}-{day}"
+            if normal_type == 'Monthly' or normal_type == 'monthly':
+                title_right = f"Valid: {mon}"
 
     fig = plt.figure(figsize=(12,12))
     fig.set_facecolor('aliceblue')
@@ -574,7 +599,7 @@ def plot_prism_data(dtype, data_region, variable, year, month, day, normal_type,
 
     fig.savefig(f"{path}/{fname}", bbox_inches='tight')
     plt.close(fig)
-    print(f"Saved {fname} to {path_print}")    
+    print(f"Saved {fname} to {path_print}")  
 
 
 
