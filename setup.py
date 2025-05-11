@@ -17,7 +17,8 @@ setup(
         "cartopy>=0.21.0",
         "xeofs>=3.0.4",
         "georasters>=0.5.29",
-        "pytz>=2024.1"
+        "pytz>=2024.1",
+        "gdal==3.10.2"
       
     ],
     author="Eric J. Drewitz",
