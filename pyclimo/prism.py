@@ -5,19 +5,19 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import numpy as np
 import pandas as pd
-import cmaps
+import pyclimo.cmaps
 import warnings
 warnings.filterwarnings('ignore')
 
 from metpy.plots import USCOUNTIES
 from datetime import datetime, timedelta
-from geometry import get_shapes
-from file_funcs import prism_file_directory
+from pyclimo.geometry import get_shapes
+from pyclimo.file_funcs import prism_file_directory
 from dateutil import tz
-from time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
-from coords import get_cwa_coords, get_region_info
-from prism_data import get_geotiff_data
-from calc import roundup, rounddown, round_to_quarter
+from pyclimo.time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
+from pyclimo.coords import get_cwa_coords, get_region_info
+from pyclimo.prism_data import get_geotiff_data
+from pyclimo.calc import roundup, rounddown, round_to_quarter
 
 mpl.rcParams['font.weight'] = 'bold'
 props = dict(boxstyle='round', facecolor='wheat', alpha=1)
