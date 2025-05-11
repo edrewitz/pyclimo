@@ -10,9 +10,10 @@ This file hosts all the functions responsible for the following:
 """
 
 import urllib.request
+import rasterio as rio
 import os
-import georasters as gr
 import pandas as pd
+import numpy as np
 import shutil
 import warnings
 warnings.filterwarnings('ignore')
@@ -114,16 +115,26 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
     
         extract_zipped_files(f"{fname_data}", f"PRISM Data/{fname_data}")
         os.remove(f"{fname_data}")
-    
-        data = gr.from_file(f"PRISM Data/{fname_data}/{geotif_data}")
 
-        df_data = data.to_pandas()
+        with rio.open(f"PRISM Data/{fname_data}/{geotif_data}") as src:
+            data = src.read(1)  
+            transform = src.transform
 
-        df_data = df_data.loc[:,['value', 'x', 'y']]
-        df_data = df_data.rename(columns={f'value':f'{variable}', f'x':f'longitude', f'y':f'latitude'})
+        height, width = data.shape
+        cols, rows = np.meshgrid(np.arange(width), np.arange(height))
+        x, y = transform * (cols, rows)
 
-        df = pd.DataFrame()
-        df = df_data
+        df = pd.DataFrame({
+            'x': x.flatten(),
+            'y': y.flatten(),
+            'value': data.flatten()
+        })
+
+        df_data = df.loc[:,['value', 'x', 'y']]
+        df_data = df_data.rename(columns={f'value':f'{variable.lower()}', f'x':f'longitude', f'y':f'latitude'})
+
+        df_data.replace(-9999, np.nan, inplace=True)
+        df_data.dropna()
 
     if dtype == 'Monthly' or dtype == 'monthly':
         url_data = f"https://data.prism.oregonstate.edu/time_series/us/an/4km/{variable}/monthly/{year}"
@@ -136,15 +147,25 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
         extract_zipped_files(f"{fname_data}", f"PRISM Data/{fname_data}")
         os.remove(f"{fname_data}")
     
-        data = gr.from_file(f"PRISM Data/{fname_data}/{geotif_data}")
+        with rio.open(f"PRISM Data/{fname_data}/{geotif_data}") as src:
+            data = src.read(1)  
+            transform = src.transform
 
-        df_data = data.to_pandas()
+        height, width = data.shape
+        cols, rows = np.meshgrid(np.arange(width), np.arange(height))
+        x, y = transform * (cols, rows)
 
-        df_data = df_data.loc[:,['value', 'x', 'y']]
+        df = pd.DataFrame({
+            'x': x.flatten(),
+            'y': y.flatten(),
+            'value': data.flatten()
+        })
+
+        df_data = df.loc[:,['value', 'x', 'y']]
         df_data = df_data.rename(columns={f'value':f'{variable.lower()}', f'x':f'longitude', f'y':f'latitude'})
 
-        df = pd.DataFrame()
-        df = df_data
+        df_data.replace(-9999, np.nan, inplace=True)
+        df_data.dropna()
     
     if dtype == 'Normals' or dtype == 'normals':
         
@@ -162,28 +183,39 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
         extract_zipped_files(f"{fname}", f"PRISM Data/{fname}")
         os.remove(f"{fname}")
     
-        var = gr.from_file(f"PRISM Data/{fname}/{geotif}")
+        with rio.open(f"PRISM Data/{fname_data}/{geotif_data}") as src:
+            data = src.read(1)  
+            transform = src.transform
 
-        df = var.to_pandas()
+        height, width = data.shape
+        cols, rows = np.meshgrid(np.arange(width), np.arange(height))
+        x, y = transform * (cols, rows)
 
-        df = df.loc[:,['value', 'x', 'y']]
+        df = pd.DataFrame({
+            'x': x.flatten(),
+            'y': y.flatten(),
+            'value': data.flatten()
+        })
 
-        df = df.rename(columns={f'value':f'{variable}', f'x':f'longitude', f'y':f'latitude'})
+        df_data = df.loc[:,['value', 'x', 'y']]
+        df_data = df_data.rename(columns={f'value':f'{variable.lower()}', f'x':f'longitude', f'y':f'latitude'})
+
+        df_data.replace(-9999, np.nan, inplace=True)
+        df_data.dropna()
 
     if variable == 'tmax' or variable == 'tmin' or variable == 'tdmean' or variable == 'tmin':
         if to_fahrenheit == True:
-            df[variable] = celsius_to_fahrenheit(df[variable])
+            df_data[variable] = celsius_to_fahrenheit(df_data[variable])
         else:
             pass
             
     if variable == 'ppt':
         if to_inches == True:
-            df[variable] = mm_to_in(df[variable])
+            df_data[variable] = mm_to_in(df_data[variable])
         else:
             pass
 
-    return df
-
+    return df_data
 
 
 
