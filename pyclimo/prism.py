@@ -5,7 +5,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import numpy as np
 import pandas as pd
-import pyclimo.cmaps
+import pyclimo.cmaps as cmaps
 import warnings
 warnings.filterwarnings('ignore')
 
