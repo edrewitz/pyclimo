@@ -21,6 +21,18 @@ A climate data analysis data visualization package.
 
 This function plots NCAR Reanalysis netCDF4 data from the NOAA Physical Science Laboratory. 
 
+The series of plots include:
+
+i) Period Mean
+
+ii) Spatial EOF1 
+
+iii) Spatial EOF2
+
+iv) EOF1 Scores
+
+v) EOF2 Scores
+
 Required Arguments:
 
 1) variable (String) - The variable name.
@@ -32,8 +44,6 @@ Required Arguments:
    'hgt' - Geopotential Height
    
    'rhum' - Relative Humidity
-   
-   'shum' - Specific Humidity
    
    'omega' - Vertical Velocity
    
@@ -55,8 +65,6 @@ Required Arguments:
    
    'cfnlf' - Cloud Forcing Net Longwave Flux
    
-   'pevpr' - Surface Potential Evaporation Rate
-   
    'pr_wtr' - Precipitable Water
    
    'pottmp' - Potential Temperature
@@ -69,7 +77,8 @@ Required Arguments:
 
     i) 'pressure' or 'pressure level'
 
-    This type looks at a variable on a certain pressure level. 
+    This type looks at a variable on a certain pressure level.
+   
     Available Variables for 'pressure' include:
     
     'air' - Temperature at a specific level
@@ -77,8 +86,6 @@ Required Arguments:
     'hgt' - Geopotential Height at a specific level
    
     'rhum' - Relative Humidity at a specific level
-   
-    'shum' - Specific Humidity at a specific level
    
     'omega' - Vertical Velocity at a specific level
    
@@ -88,7 +95,8 @@ Required Arguments:
     
     ii) 'surface gauss' or 'sfc gauss'
 
-    This type looks at a variable at the surface level. 
+    This type looks at a variable at the surface level.
+   
     Available Variables for 'surface gauss' include:
     
     'air' - 2-Meter Temperature
@@ -106,12 +114,11 @@ Required Arguments:
     'vwnd' - 10-Meter V-Component of Wind
    
     'cfnlf' - Cloud Forcing Net Longwave Flux
-   
-    'pevpr' - Surface Potential Evaporation Rate
 
     iii) 'surface' or 'surface data'
     
-    This type looks at a variable at the surface level. 
+    This type looks at a variable at the surface level.
+   
     Available Variables for 'surface' include:
 
     'pr_wtr' - Precipitation Rate
@@ -137,21 +144,25 @@ Required Arguments:
 3) western_bound (Float or Integer) - The western bound for the plot in decimal degrees.
 
     Negative Values = Western Hemisphere
+   
     Positive Values = Eastern Hemisphere
 
 4) eastern_bound (Float or Integer) - The eastern bound for the plot in decimal degrees.
-
+   
     Negative Values = Western Hemisphere
+   
     Positive Values = Eastern Hemisphere
     
 5) southern_bound (Float or Integer) - The southern bound for the plot in decimal degrees.
-
+    
     Negative Values = Southern Hemisphere
+   
     Positive Values = Northern Hemisphere
 
 6) northern_bound (Float or Integer) - The northern bound for the plot in decimal degrees.
-
+    
     Negative Values = Southern Hemisphere
+    
     Positive Values = Northern Hemisphere
 
 7) start_date (String) - The start date of the analysis period in the 'YYYY-mm-dd' format. 
@@ -207,11 +218,16 @@ Optional Arguments:
     '10'
 
 Returns
-1) A plot of the mean value for the variable for the period. 
+
+1) A plot of the mean value for the variable for the period.
+
 2) A plot showing EOF1 for the variable for the period. 
+
 3) A plot showing EOF2 for the variable for the period. 
+
 4) A plot showing EOF1 score time series for the variable for the period.
-5) A plot showing EOF2 score time series for the variable for the period.
+
+5) A plot showing EOF2 score time series for the variable for the period. 
 
 
 
