@@ -183,7 +183,7 @@ def get_geotiff_data(dtype, variable, year, month, day, normal_type, clear_data_
         extract_zipped_files(f"{fname}", f"PRISM Data/{fname}")
         os.remove(f"{fname}")
     
-        with rio.open(f"PRISM Data/{fname_data}/{geotif_data}") as src:
+        with rio.open(f"PRISM Data/{fname}/{geotif}") as src:
             data = src.read(1)  
             transform = src.transform
 
