@@ -11,7 +11,7 @@ import matplotlib.dates as md
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import numpy as np
-import pyclimo.cmaps
+import pyclimo.cmaps as cmaps
 import warnings
 warnings.filterwarnings('ignore')
 
