@@ -5,13 +5,17 @@ This file holds the functions that perform calculations.
 """
 import math
 import numpy as np
-import warnings
-warnings.filterwarnings('ignore')
+
+def round_to_quarter(x):
+    """
+    Round to the nearest 0.25
+    """
+    return round(x * 4) / 4
 
 def mm_to_in(mm):
 
     """
-    Convers millimeters to inches
+    Converts millimeters to inches
     """
 
     return mm * 0.0393701
