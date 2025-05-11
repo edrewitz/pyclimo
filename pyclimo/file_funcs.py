@@ -2,7 +2,7 @@ import os
 import warnings
 warnings.filterwarnings('ignore')
 
-def noaa_psl_directory(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date):
+def noaa_psl_directory(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date, dataset_type, level):
 
     """
     This function builds the file directory for the NOAA PSL Graphics. 
@@ -96,6 +96,29 @@ def noaa_psl_directory(variable, level_type, western_bound, eastern_bound, south
 
     8) end_date (String) - The end date of the analysis period in the 'YYYY-mm-dd' format.
 
+    9) dataset_type (String) - The type of dataset (i.e. NCAR Reanalysis)
+
+    10) level (String) - Default = '500'. The pressure level in hPa. 
+        Valid levels:
+
+        '1000'
+        '925'
+        '850'
+        '700'
+        '600'
+        '500'
+        '400'
+        '300'
+        '250'
+        '200'
+        '150'
+        '100'
+        '70'
+        '50'
+        '30'
+        '20'
+        '10'
+
     Returns
     -------
 
@@ -103,9 +126,9 @@ def noaa_psl_directory(variable, level_type, western_bound, eastern_bound, south
     2) An abbreviation of the path to be printed to the user
     """
 
-
     variable = variable.upper()
     level_type = level_type.upper()
+    dataset_type = dataset_type.upper()
     
     start_year = f"{start_date[0]}{start_date[1]}{start_date[2]}{start_date[3]}"
     start_month = f"{start_date[5]}{start_date[6]}"
@@ -137,39 +160,95 @@ def noaa_psl_directory(variable, level_type, western_bound, eastern_bound, south
     southern_bound = abs(southern_bound)
     northern_bound = abs(northern_bound)
 
-    if os.path.exists(f"Climate Analysis Graphics"):
-        pass
+    if level_type == 'SURFACE GAUSS' or level_type == 'SFC GAUSS' or level_type == 'SURFACE' or level_type == 'SURFACE DATA':
+
+        if os.path.exists(f"Climate Analysis Graphics"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}"):
+            pass
+    
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}"):
+            pass
+    
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}")
+    
+        path = f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}"
+        path_print = f"f:Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}"
+
     else:
-        os.mkdir(f"Climate Analysis Graphics")
 
-    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL"):
-        pass
-    else:
-        os.mkdir(f"Climate Analysis Graphics/NOAA PSL")
+        if os.path.exists(f"Climate Analysis Graphics"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}"):
+            pass
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}"):
+            pass
+    
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}")
+    
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}"):
+            pass
+    
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}")
 
-    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}"):
-        pass
-    else:
-        os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}")
-
-    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}"):
-        pass
-    else:
-        os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}")
-
-    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}"):
-        pass
-    else:
-        os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}")
-
-    if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}"):
-        pass
-
-    else:
-        os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}")
-
-    path = f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}"
-    path_print = f"f:Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}"
+        if os.path.exists(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}/{level}"):
+            pass
+    
+        else:
+            os.mkdir(f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}/{level}")
+    
+        path = f"Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}/{level}"
+        path_print = f"f:Climate Analysis Graphics/NOAA PSL/{variable}/{level_type}/{western_bound}{wsym}_{eastern_bound}{esym}_{northern_bound}{nsym}_{southern_bound}{ssym}/{start_year}_{start_month}_{start_day}_to_{end_year}_{end_month}_{end_day}/{dataset_type}/{level}"
 
     return path, path_print
 
