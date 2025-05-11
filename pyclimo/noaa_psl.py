@@ -11,15 +11,15 @@ import matplotlib.dates as md
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import numpy as np
-import cmaps
+import pyclimo.cmaps
 import warnings
 warnings.filterwarnings('ignore')
 
 from dateutil import tz
-from time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
-from noaa_psl_data import get_psl_netcdf
-from calc import celsius_to_fahrenheit, roundup, rounddown, mm_to_in
-from file_funcs import noaa_psl_directory
+from pyclimo.time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
+from pyclimo.noaa_psl_data import get_psl_netcdf
+from pyclimo.calc import celsius_to_fahrenheit, roundup, rounddown, mm_to_in
+from pyclimo.file_funcs import noaa_psl_directory
 
 mpl.rcParams['font.weight'] = 'bold'
 props = dict(boxstyle='round', facecolor='wheat', alpha=1)
