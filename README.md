@@ -32,7 +32,13 @@ An open source climate data analysis and visualization package.
 
    [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/Examples/Winter_2024_2025_Analysis.ipynb) to view Example 1.
       
-   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/tree/main/graphics/Example%201) to view the graphics created in Example 1. 
+   Example 1 Graphics:
+
+   1) [Mean 500mb Geopotential Height](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%201/MEAN%20500%20MB%20GEOPOTENTIAL%20HEIGHT%20%5BDM%5D.png)
+   2) [EOF1 500mb Geopotential Height](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%201/EOF1%20500%20MB%20GEOPOTENTIAL%20HEIGHT.png)
+   3) [EOF2 500mb Geopotential Height](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%201/EOF2%20500%20MB%20GEOPOTENTIAL%20HEIGHT.png)
+   4) [EOF1 Scores](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%201/EOF1%20Scores.png)
+   5) [EOF2 Scores](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%201/EOF2%20Scores.png)
 
 # Documentation
 
