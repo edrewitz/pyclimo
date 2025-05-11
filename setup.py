@@ -16,8 +16,7 @@ setup(
         "xarray>=2023.1.0",
         "cartopy>=0.21.0",
         "xeofs>=3.0.4",
-        "gdal==3.10.2",
-        "georasters>=0.5.29",
+        "rasterio>=1.4.3",
         "pytz>=2024.1"
       
     ],
