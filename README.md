@@ -15,6 +15,7 @@ A climate data analysis data visualization package.
 # Documentation
 
 1) [plot_ncar_reanalysis_data_period_mean_eof1_eof2()]()
+2) [plot_prism_data()]()
 
 
 ### plot_ncar_reanalysis_data_period_mean_eof1_eof2()
@@ -227,7 +228,223 @@ Returns
 
 4) A plot showing EOF1 score time series for the variable for the period.
 
-5) A plot showing EOF2 score time series for the variable for the period. 
+5) A plot showing EOF2 score time series for the variable for the period.
+
+
+### plot_prism_data()
+
+This function downloads and plots PRISM Climate Data and saves the graphics to a folder. 
+
+If the folder does not exist, the function will build the new directory. 
+
+Required Arguments:
+
+1) dtype (String) - Data Type: Daily, Monthly, Normals
+   - Daily = Daily Data
+   - Monthly = Monthly Data
+   - Normals = 30-Year Climate Normals
+
+2) variable (String) - The variable to analyze. 
+
+   Universal Variables:
+   - ppt = Daily [monthly] total precipitation (rain+melted snow) 
+   - tdmean = Daily mean dew point temperature [averaged over all days in the month]
+   - tmax = Daily maximum temperature [averaged over all days in the month]
+   - tmean = Daily mean temperature, calculated as (tmax+tmin)/2
+   - tmin = Daily minimum temperature [averaged over all days in the month]
+   - vpdmax = Daily maximum vapor pressure deficit [averaged over all days in the month] 
+   - vpdmin = Daily minimum vapor pressure deficit [averaged over all days in the month] 
+
+3) year (String) - Year
+   Daily Data goes back to 1981
+   Monthly Data goes back to 1895
+
+4) month (String) - 2 digit abbreviation for month (MM)
+
+5) day (String) - For daily data only - 2 digit abbreviation for day (DD)
+   If the user wants to use monthly data instead of daily data, pass a value of None for the variable day. 
+
+6) normal_type (String) - Daily or Monthly normals.
+
+Optional Arguments:
+
+1) clear_data_in_folder (Boolean) - Default=True - When set to True, the user will clear all old data in the f:PRISM Data folder. 
+   When set to False, the old data will remain un-touched and archived in the f:PRISM Data folder. 
+
+2) to_fahrenheit (Boolean) - Default = True. When set to True, if the user is plotting a temperature based parameter, the values will convert to Fahrenheit. 
+   When set to False, the values will remain in Celsius. 
+
+3) to_inches (Boolean) - Default = True. When set to True, if the user is plotting precipitation, the values will convert to inches. 
+   When set to False, the values will remain in mm. 
+
+4) western_bound (Integer or Float) - Default = None. Western extent of the plot in decimal degrees. 
+   The default setting is None. If set to None, the user must select a state or gacc_region. 
+   This setting should be changed from None to an integer or float value if the user wishes to
+   have a custom area selected. Negative values denote the western hemisphere and positive 
+   values denote the eastern hemisphere. 
+
+5) eastern_bound (Integer or Float) - Default = None. Eastern extent of the plot in decimal degrees. 
+   The default setting is None. If set to None, the user must select a state or gacc_region. 
+   This setting should be changed from None to an integer or float value if the user wishes to
+   have a custom area selected. Negative values denote the western hemisphere and positive 
+   values denote the eastern hemisphere. 
+
+6) southern_bound (Integer or Float) - Default = None. Southern extent of the plot in decimal degrees. 
+   The default setting is None. If set to None, the user must select a state or gacc_region. 
+   This setting should be changed from None to an integer or float value if the user wishes to
+   have a custom area selected. Positive values denote the northern hemisphere and negative 
+   values denote the southern hemisphere. 
+
+7) northern_bound (Integer or Float) - Default = None. Northern extent of the plot in decimal degrees. 
+   The default setting is None. If set to None, the user must select a state or gacc_region. 
+   This setting should be changed from None to an integer or float value if the user wishes to
+   have a custom area selected. Positive values denote the northern hemisphere and negative 
+   values denote the southern hemisphere.
+
+8) reference_system (String) - Default = 'States & Counties'. The georgraphical reference system with respect to the borders on the map. If the user
+    wishes to use a reference system not on this list, please see items 8-14. 
+    Reference Systems:
+
+    1) 'States & Counties'
+    2) 'States Only'
+    3) 'GACC Only'
+    4) 'GACC & PSA'
+    5) 'CWA Only'
+    6) 'NWS CWAs & NWS Public Zones'
+    7) 'NWS CWAs & NWS Fire Weather Zones'
+    8) 'NWS CWAs & Counties'
+    9) 'GACC & PSA & NWS Fire Weather Zones'
+    10) 'GACC & PSA & NWS Public Zones'
+    11) 'GACC & PSA & NWS CWA'
+    12) 'GACC & PSA & Counties'
+    13) 'GACC & Counties'
+                       
+
+9) show_state_borders (Boolean) - If set to True, state borders will display. If set to False, state borders will not display. 
+    Default setting is False. Users should change this value to False if they wish to hide state borders. 
+
+10) show_county_borders (Boolean) - If set to True, county borders will display. If set to False, county borders will not display. 
+    Default setting is False. Users should change this value to False if they wish to hide county borders. 
+
+11) show_gacc_borders (Boolean) - If set to True, GACC (Geographic Area Coordination Center) borders will display. If set to False, GACC borders will not display. 
+    Default setting is False. Users should change this value to True if they wish to display GACC borders. 
+
+12) show_psa_borders (Boolean) - If set to True, PSA (Predictive Services Area) borders will display. If set to False, PSA borders will not display. 
+    Default setting is False. Users should change this value to True if they wish to display PSA borders.
+
+13) show_cwa_borders (Boolean) - If set to True, CWA borders will display. If set to False, CWA borders will not display. 
+    Default setting is False. Users should change this value to True if they wish to display CWA borders.
+
+14) show_nws_firewx_zones (Boolean) - If set to True, NWS FWZ borders will display. If set to False, NWS FWZ borders will not display. 
+    Default setting is False. Users should change this value to True if they wish to display NWS FWZ borders.
+
+15) show_nws_public_zones (Boolean) - If set to True, NWS Public Zone borders will display. If set to False, NWS Public Zone borders will not display. 
+    Default setting is False. Users should change this value to True if they wish to display NWS Public Zone borders.
+
+16) state_border_linewidth (Integer) - Linewidth (thickness) of the state borders. Default setting is 2. 
+
+17) county_border_linewidth (Integer) - Linewidth (thickness) of the county borders. Default setting is 1. 
+
+18) gacc_border_linewidth (Integer) - Linewidth (thickness) of the GACC borders. Default setting is 2. 
+
+19) psa_border_linewidth (Integer) - Linewidth (thickness) of the PSA borders. Default setting is 1. 
+
+20) state_border_linestyle (String) - Linestyle of the state borders. Default is a solid line. 
+    To change to a dashed line, users should set state_border_linestyle='--'. 
+
+21) county_border_linestyle (String) - Linestyle of the county borders. Default is a solid line. 
+    To change to a dashed line, users should set county_border_linestyle='--'. 
+
+22) gacc_border_linestyle (String) - Linestyle of the GACC borders. Default is a solid line. 
+    To change to a dashed line, users should set gacc_border_linestyle='--'. 
+
+23) psa_border_linestyle (String) - Linestyle of the PSA borders. Default is a solid line. 
+    To change to a dashed line, users should set psa_border_linestyle='--'. 
+
+24) cwa_border_linestyle (String) - Linestyle of the CWA borders. Default is a solid line. 
+    To change to a dashed line, users should set psa_border_linestyle='--'. 
+
+25) nws_firewx_zones_linestyle (String) - Linestyle of the NWS FWZ borders. Default is a solid line. 
+    To change to a dashed line, users should set psa_border_linestyle='--'. 
+
+26) nws_public_zones_linestyle (String) - Linestyle of the NWS Public Zone borders. Default is a solid line. 
+    To change to a dashed line, users should set psa_border_linestyle='--'. 
+
+27) region (String) - The two letter state abbreviation or four letter GACC Region abbreviation for the region the user wishes to make the graphic for. 
+    If the user wishes to make a graphic for the entire CONUS, there are 4 acceptable abbreviations: 'US' or 'us'
+    or 'USA' or 'usa'. Example: If the user wishes to make a plot for the state of California both 'CA' or 'ca' are
+    acceptable. Default setting is 'us'. If the user wishes to make a plot based on gacc_region, this value must be 
+    changed to None. 
+
+    Here is a list of acceptable GACC Regions abbreviations:
+
+    South Ops: 'OSCC' or 'oscc' or 'SOPS' or 'sops'
+    
+    North Ops: 'ONCC' or 'oncc' or 'NOPS' or 'nops'
+    
+    Great Basin: 'GBCC' or 'gbcc' or 'GB' or 'gb'
+    
+    Northern Rockies: 'NRCC' or 'nrcc' or 'NR' or 'nr'
+    
+    Rocky Mountain: 'RMCC' or 'rmcc' or 'RM' or 'rm'
+    
+    Southwest: 'SWCC' or 'swcc' or 'SW' or 'sw'
+    
+    Southern: 'SACC' or 'sacc' or 'SE' or 'se'
+    
+    Eastern: 'EACC' or 'eacc' or 'E' or 'e'
+    
+    Pacific Northwest: 'PNW' or 'pnw' or 'NWCC' or 'nwcc' or 'NW' or 'nw'
+    
+    Alaska: Setting state='AK' or state='ak' suffices here. Leave gacc_region=None and set the state variable as shown. 
+
+28) x1 (Float) - Default = 0.01. The x-position of the signature text box with respect to the axis of the image. 
+
+29) y1 (Float) - Default = -0.03. The y-position of the signature text box with respect to the axis of the image. 
+
+30) x2 (Float) - Default = 0.725. The x-position of the timestamp text box with respect to the axis of the image.
+
+31) y2 (Float) - Default = -0.025. The y-position of the timestamp text box with respect to the axis of the image.
+
+32) x3 (Float) - Default = 0.01. The x-position of the reference system text box with respect to the axis of the image.
+
+33) y3 (Float) - Default = 0.01. The y-position of the reference system text box with respect to the axis of the image.
+
+34) cwa (String) - *For Alaska only* - The 3-letter abbreviation for the National Weather Service CWA. 
+    For a view of the entire state - set cwa=None. 
+
+    NWS CWA Abbreviations:
+
+    1) AER - NWS Anchorage East Domain
+    
+    2) ALU - NWS Anchorage West Domain
+    
+    3) AJK - NWS Juneau
+    
+    4) AFG - NWS Fairbanks        
+
+35) signature_fontsize (Integer) - Default = 6. The fontsize of the signature. This is only to be changed when making a custom plot. 
+
+36) stamp_fontsize (Integer) - Default = 5. The fontsize of the timestamp and reference system text. This is only to be changed when making a custom plot. 
+
+37) shrink (Integer or Float) - Default = 0.7. This is how the colorbar is sized to the figure. 
+        This is a feature of matplotlib, as per their definition, the shrink is:
+        "Fraction by which to multiply the size of the colorbar." 
+        This should only be changed if the user wishes to change the size of the colorbar. 
+        Preset values are called from the settings module for each state and/or gacc_region.
+
+
+Returns
+
+An graphic showing the analysis of PRISM Data saved to a path. 
+
+If the user is plotting monthly data, the path will be:
+
+f:Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{resolution}/{normal_type}/{reference_system}
+
+If the user is plotting daily data, the path will be:
+
+f:Climate Analysis Graphics/PRISM/{dtype}/{region}/{variable}/{year}/{month}/{day}/{resolution}/{normal_type}/{reference_system}    
 
 
 
