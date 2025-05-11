@@ -121,6 +121,14 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
     """
     This function plots NCAR Reanalysis netCDF4 data from the NOAA Physical Science Laboratory. 
 
+    The series of plots include:
+    
+    i) Period Mean
+    ii) Spatial EOF1 
+    iii) Spatial EOF2
+    iv) EOF1 Scores
+    v) EOF2 Scores
+
     Required Arguments:
 
     1) variable (String) - The variable name.
