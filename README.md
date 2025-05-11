@@ -15,7 +15,7 @@ A climate data analysis data visualization package.
 # Documentation
 
 1) [plot_ncar_reanalysis_data_period_mean_eof1_eof2()](https://github.com/edrewitz/pyclimo/blob/main/README.md#plot_ncar_reanalysis_data_period_mean_eof1_eof2)
-2) [plot_prism_data()]()
+2) [plot_prism_data()](https://github.com/edrewitz/pyclimo/blob/main/README.md#plot_prism_data)
 
 
 ### plot_ncar_reanalysis_data_period_mean_eof1_eof2()
