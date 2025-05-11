@@ -18,7 +18,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from zipfile import ZipFile
-from calc import celsius_to_fahrenheit, mm_to_in
+from pyclimo.calc import celsius_to_fahrenheit, mm_to_in
 
 def extract_zipped_files(file_path, extraction_folder):
 
