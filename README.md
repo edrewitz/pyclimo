@@ -14,7 +14,9 @@ An open source climate data analysis and visualization package.
 
 # Jupyter Lab Examples
 
-1) A first time user setup with analyzing NCAR Reanalysis data for 500mb geopotential heights for DJF 2024-2025 (Winter 2024-2025).
+1) **Winter 2024-2025 500 MB Geopotential Height Analysis**
+
+   A first time user setup with analyzing NCAR Reanalysis data for 500mb geopotential heights for DJF 2024-2025 (Winter 2024-2025).
    
    In this example we will create 5 graphics showing the following:
    
