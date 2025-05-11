@@ -61,12 +61,6 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
        - tmin = Daily minimum temperature [averaged over all days in the month]
        - vpdmax = Daily maximum vapor pressure deficit [averaged over all days in the month] 
        - vpdmin = Daily minimum vapor pressure deficit [averaged over all days in the month] 
-       
-       Additional Variables For Normals Only at 800m resolution:
-       - solclear = Total daily global shortwave solar radiation received on a horizontal surface under clear sky conditions [averaged over all days in the month] 
-       - solslope = Total daily global shortwave solar radiation received on a sloped surface [averaged over all days in the month] 
-       - soltotal = Total daily global shortwave solar radiation received on a horizontal surface [averaged over all days in the month] 
-       - soltrans = Atmospheric transmittance (cloudiness) [monthly average daily soltotal/monthly average daily solclear]
 
     3) year (String) - Year
        Daily Data goes back to 1981
