@@ -1,1 +1,2 @@
 from pyclimo.noaa_psl import plot_ncar_reanalysis_data_period_mean_eof1_eof2
+from pyclimo.prism import plot_prism_data
