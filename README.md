@@ -462,5 +462,11 @@ Pandas: McKinney, W., & others. (2010). Data structures for statistical computin
 
 xeofs: Rieger, N. & Levang, S. J. (2024). xeofs: Comprehensive EOF analysis in Python with xarray. Journal of Open Source Software, 9(93), 6060. DOI: https://doi.org/10.21105/joss.06060
 
-georasters: Ozak, E. (2021). georasters: Geographic Raster functionality for Python using osgeo and GDAL (Version 0.5.29) 
+rasterio: @software{gillies_2019,
+  author =    {Sean Gillies and others},
+  organization = {Mapbox},
+  title =     {Rasterio: geospatial raster I/O for {Python} programmers},
+  year =      {2013--},
+  url = "https://github.com/rasterio/rasterio"
+}
 
