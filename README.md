@@ -50,7 +50,7 @@ An open source climate data analysis and visualization package.
 
 3) **Plotting the Monthly Normal Maximum Vapor Pressure Deficit for August using the Geographic Area Coordination Center/Predictive Services Areas Reference System**
 
-   In this example we will plot the monthly normal for the Maximum Vapor Pressure Deficit for August using the 'GACC & PSA' reference system.
+   In this example we will plot the monthly normal for the maximum vapor pressure Deficit for August using the 'GACC & PSA' reference system.
 
    This data is from PRISM Climate Group. 
 
@@ -66,7 +66,15 @@ An open source climate data analysis and visualization package.
 
    [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/Examples/Sandy.ipynb) to view Example 4.
 
-   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%204/PPT.png) to view the graphic created in Example 4. 
+   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%204/PPT.png) to view the graphic created in Example 4.
+
+5) **Plotting the Mean Monthly Minimum Temperature for December 2017**
+
+   In this example, we will plot the mean monthly minimum temperature for December 2017 using the data from PRISM Climate Group.
+
+   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/Examples/Dec2017.ipynb) to view Example 5.
+
+   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%205/TMIN.png) to view the graphic created in Example 5. 
 
 # Documentation
 
