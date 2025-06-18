@@ -18,7 +18,8 @@ setup(
         "cartopy>=0.21.0",
         "xeofs>=3.0.4",
         "rasterio>=1.4.3",
-        "pytz>=2024.1"
+        "pytz>=2024.1",
+        "geopandas>=1.1.0"
       
     ],
     author="Eric J. Drewitz",
