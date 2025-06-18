@@ -20,20 +20,20 @@ from pyclimo.prism_data import extract_zipped_files
 
 def get_geo_json(file_path):
 
-     """
+    """
      This function extracts a local geojson file if the user wishes to import custom geometrical boundaries.
-
+     
      Required Arguments:
-
+     
      1) file_path (String) - The path to the geojson file
-
+     
      Optional Arguments: None
-
+     
      Returns
      -------
-
+     
      1) The geometries of the geojson file. 
-     """
+    """
 
     crs = ccrs.PlateCarree()
     gdf = gpd.read_file(file_path)
