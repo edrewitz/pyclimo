@@ -11,7 +11,7 @@ warnings.filterwarnings('ignore')
 
 from metpy.plots import USCOUNTIES
 from datetime import datetime, timedelta
-from pyclimo.geometry import get_shapes
+from pyclimo.geometry import get_shapes, get_geo_json 
 from pyclimo.file_funcs import prism_file_directory
 from dateutil import tz
 from pyclimo.time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
@@ -38,7 +38,7 @@ from_zone = tz.tzutc()
 to_zone = tz.tzlocal()
 
 
-def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_in_folder=True, to_fahrenheit=True, to_inches=True, western_bound=None, eastern_bound=None, southern_bound=None, northern_bound=None, reference_system='States & Counties', show_state_borders=False, show_county_borders=False, show_gacc_borders=False, show_psa_borders=False, show_cwa_borders=False, show_nws_firewx_zones=False, show_nws_public_zones=False, state_border_linewidth=1, county_border_linewidth=0.25, gacc_border_linewidth=1, psa_border_linewidth=0.5, cwa_border_linewidth=1, nws_firewx_zones_linewidth=0.25, nws_public_zones_linewidth=0.25, state_border_linestyle='-', county_border_linestyle='-', gacc_border_linestyle='-', psa_border_linestyle='-', cwa_border_linestyle='-', nws_firewx_zones_linestyle='-', nws_public_zones_linestyle='-', region='conus', x1=0.01, y1=-0.03, x2=0.725, y2=-0.025, x3=0.01, y3=0.01, cwa=None, signature_fontsize=6, stamp_fontsize=5, shrink=0.7):
+def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_in_folder=True, to_fahrenheit=True, to_inches=True, western_bound=None, eastern_bound=None, southern_bound=None, northern_bound=None, reference_system='States & Counties', show_state_borders=False, show_county_borders=False, show_gacc_borders=False, show_psa_borders=False, show_cwa_borders=False, show_nws_firewx_zones=False, show_nws_public_zones=False, state_border_linewidth=1, county_border_linewidth=0.25, gacc_border_linewidth=1, psa_border_linewidth=0.5, cwa_border_linewidth=1, nws_firewx_zones_linewidth=0.25, nws_public_zones_linewidth=0.25, state_border_linestyle='-', county_border_linestyle='-', gacc_border_linestyle='-', psa_border_linestyle='-', cwa_border_linestyle='-', nws_firewx_zones_linestyle='-', nws_public_zones_linestyle='-', region='conus', x1=0.01, y1=-0.03, x2=0.725, y2=-0.025, x3=0.01, y3=0.01, cwa=None, signature_fontsize=6, stamp_fontsize=5, shrink=0.7, custom_geojson=False, geojson_path=None, reference_system_label=None, custom_border_color='black', custom_border_linewidth=1):
 
     """
     This function downloads and plots PRISM Climate Data and saves the graphics to a folder. 
@@ -61,6 +61,12 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
        - tmin = Daily minimum temperature [averaged over all days in the month]
        - vpdmax = Daily maximum vapor pressure deficit [averaged over all days in the month] 
        - vpdmin = Daily minimum vapor pressure deficit [averaged over all days in the month] 
+       
+       Additional Variables For Normals Only at 800m resolution:
+       - solclear = Total daily global shortwave solar radiation received on a horizontal surface under clear sky conditions [averaged over all days in the month] 
+       - solslope = Total daily global shortwave solar radiation received on a sloped surface [averaged over all days in the month] 
+       - soltotal = Total daily global shortwave solar radiation received on a horizontal surface [averaged over all days in the month] 
+       - soltrans = Atmospheric transmittance (cloudiness) [monthly average daily soltotal/monthly average daily solclear]
 
     3) year (String) - Year
        Daily Data goes back to 1981
@@ -205,6 +211,10 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
         
         Alaska: Setting state='AK' or state='ak' suffices here. Leave gacc_region=None and set the state variable as shown. 
 
+        Other regions include: 
+        
+        Southern California Edison's Service Area (region='sce' or region='SCE')
+
     28) x1 (Float) - Default = 0.01. The x-position of the signature text box with respect to the axis of the image. 
 
     29) y1 (Float) - Default = -0.03. The y-position of the signature text box with respect to the axis of the image. 
@@ -239,6 +249,17 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
             "Fraction by which to multiply the size of the colorbar." 
             This should only be changed if the user wishes to change the size of the colorbar. 
             Preset values are called from the settings module for each state and/or gacc_region.
+
+    38) custom_geojson (Boolean) - Default = False. When set to True, the user can import a geojson file locally hosted on their PC. This is used when
+        the user wants to use custom boundaries not found in pyclimo or geometries hosted in a geojson file that the user wishes to remain internal. 
+
+    39) geojson_path (String) - Default = None. The complete path to the geojson file on the user's computer. 
+
+    40) reference_system_label (String) - Default = None. The name of the reference system if the user wishes to use a custom reference system. 
+
+    41) custom_border_color (String) - Default='black'. The color of the border of the custom boundaries (the geometries in the locally hosted geojson).
+
+    42) custom_border_linewidth (Integer) - Default = 1. The linewidth of the border of the custom boundaries (the geometries in the locally hosted geojson).
     
 
     Returns
@@ -290,6 +311,12 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
     if month == '12':
         mon = 'DEC'
 
+    if custom_geojson == True:
+        shapes = get_geo_json(geojson_path)
+    else:
+        pass
+    
+
     if reference_system == 'Custom' or reference_system == 'custom':
         show_state_borders = show_state_borders
         show_county_borders = show_county_borders
@@ -300,6 +327,8 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
         show_nws_public_zones = show_nws_public_zones
 
     if reference_system != 'Custom' and reference_system != 'custom':
+
+        reference_system_label = reference_system
         
         show_state_borders = False
         show_county_borders = False
@@ -372,7 +401,7 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
             if region == 'CONUS' or region == 'conus':
                 county_border_linewidth=0.25   
 
-    path, path_print = prism_file_directory(dtype, 'us', variable, year, month, day, '4km', normal_type, reference_system)
+    path, path_print = prism_file_directory(dtype, 'us', variable, year, month, day, '4km', normal_type, reference_system_label)
 
     fname = f"{variable.upper()}.png"
 
@@ -578,6 +607,8 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
         ax.add_feature(PZs, linewidth=nws_public_zones_linewidth, linestyle=nws_public_zones_linestyle, zorder=5)
     else:
         pass  
+    if custom_geojson == True:
+        ax.add_geometries(shapes, crs=datacrs, facecolor='none', edgecolor=custom_border_color, linewidth=custom_border_linewidth)
 
     plt.title(f"{title_left}", fontsize=8, fontweight='bold', loc='left')
     
@@ -585,7 +616,7 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
 
     ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: PRISM Climate Group: prism.oregonstate.edu", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
     ax.text(x2, y2, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
-    ax.text(x3, y3, "Reference System: "+reference_system, transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props, zorder=11)  
+    ax.text(x3, y3, "Reference System: "+reference_system_label, transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props, zorder=11)  
 
     cs = ax.scatter(lon, lat, c=var, cmap=cmap, alpha=0.5, transform=datacrs, vmin=vmin, vmax=vmax)
 
