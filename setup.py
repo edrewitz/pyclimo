@@ -6,7 +6,7 @@ if sys.version_info[0] < 3:
 
 setup(
     name = "pyclimo",
-    version = "1.0",
+    version = "1.1",
     packages = find_packages(),
     install_requires=[
         "matplotlib>=3.7",
