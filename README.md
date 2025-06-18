@@ -13,7 +13,7 @@ An open source climate data analysis and visualization package.
 
 Anaconda Downloads:
 
- [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/pyclimo.svg)](https://anaconda.org/conda-forge/pyclimo)
+[![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/pyclimo.svg)](https://anaconda.org/conda-forge/pyclimo)
 
  PIP Downloads:
 
