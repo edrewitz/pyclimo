@@ -297,6 +297,10 @@ Optional Arguments:
     '20'
     '10'
 
+12) hemispheric_view (Boolean) - Default = False. When set to True, the view will be a Polar Stereographic of either the Northern or Southern Hemisphere.
+
+13) hemisphere (String) - Default = 'N'. When set to 'N' the hemispheric view will be that of the Northern Hemisphere. Set to 'S' for Southern Hemisphere. 
+
 Returns
 
 1) A plot of the mean value for the variable for the period.
@@ -512,6 +516,16 @@ Optional Arguments:
         This should only be changed if the user wishes to change the size of the colorbar. 
         Preset values are called from the settings module for each state and/or gacc_region.
 
+38) custom_geojson (Boolean) - Default = False. When set to True, the user can import a geojson file locally hosted on their PC. This is used when
+  the user wants to use custom boundaries not found in pyclimo or geometries hosted in a geojson file that the user wishes to remain internal. 
+
+39) geojson_path (String) - Default = None. The complete path to the geojson file on the user's computer. 
+
+40) reference_system_label (String) - Default = None. The name of the reference system if the user wishes to use a custom reference system. 
+
+41) custom_border_color (String) - Default='black'. The color of the border of the custom boundaries (the geometries in the locally hosted geojson).
+
+42) custom_border_linewidth (Integer) - Default = 1. The linewidth of the border of the custom boundaries (the geometries in the locally hosted geojson).
 
 Returns
 
