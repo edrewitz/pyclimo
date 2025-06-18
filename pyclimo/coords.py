@@ -1,11 +1,4 @@
-"""
-This file hosts the coordinates for the different regions in the United States. 
 
-(C) Meteorologist Eric J. Drewitz
-"""
-
-import warnings
-warnings.filterwarnings('ignore')
 
 def get_cwa_coords(cwa):
 
@@ -705,6 +698,18 @@ def get_region_info(region):
         southern_bound = 32.4
         northern_bound = 39.06
         shrink = 0.7
+        x1, y1 = 0.01, -0.03
+        x2, y2 = 0.725, -0.025
+        x3, y3 = 0.01, 0.01
+        signature_fontsize = 6
+        stamp_fontsize = 5
+
+    if region == 'SCE' or region == 'sce':
+        western_bound = -120.9
+        eastern_bound = -113.93
+        southern_bound = 33
+        northern_bound = 39.06
+        shrink = 0.75
         x1, y1 = 0.01, -0.03
         x2, y2 = 0.725, -0.025
         x3, y3 = 0.01, 0.01
