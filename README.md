@@ -89,7 +89,43 @@ Anaconda Downloads:
 
    [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/Examples/Dec2017.ipynb) to view Example 5.
 
-   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%205/TMIN.png) to view the graphic created in Example 5. 
+   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%205/TMIN.png) to view the graphic created in Example 5.
+
+6) **Winter 2024-2025 Sea-Level Pressure Analysis Northern Hemispheric View**
+
+   In this example we will create 5 graphics showing the following:
+   
+   i) Mean Sea-Level Pressure for the period
+   
+   ii) EOF1 (1st Principle Component/1st Empirical Orthogonal Function) for the period
+   
+   iii) EOF2 (2nd Principle Component/2nd Empirical Orthogonal Function) for the period
+   
+   iv) EOF1 Scores for the period
+   
+   v) EOF2 Scores for the period
+
+   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/Examples/Winter_2024_2025_Analysis_NH.ipynb) to view Example 6.
+
+   Example 6 Graphics:
+
+   1) [Mean Sea Level Pressure](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%206/MEAN%20SEA%20LEVEL%20PRESSURE%20%5BhPa%5D.png)
+   2) [EOF1 Sea Level Pressure](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%206/EOF1%20SEA%20LEVEL%20PRESSURE.png)
+   3) [EOF2 Sea Level Pressure](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%206/EOF2%20SEA%20LEVEL%20PRESSURE.png)
+   4) [EOF1 Scores](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%206/EOF1%20Scores.png)
+   5) [EOF2 Scores](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%206/EOF2%20Scores.png)
+  
+7) **Plotting the Monthly Normal Maximum Vapor Pressure Deficit for July using a Custom Reference System and Importing a Locally Hosted GeoJSON File**
+
+   In this example we will plot the monthly normal for the maximum vapor pressure Deficit for July and use a custom reference system and give it a name for the image.
+
+   We will also import a locally hosted GeoJSON file that has the geometry for the Southern California Edison (SCE) service area and overlay the SCE service area with counties. 
+
+   This data is from PRISM Climate Group. 
+
+   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/Examples/July_prism_normals.ipynb) to view Example 7.
+
+   [click here](https://github.com/edrewitz/PyClimo-Jupyter-Lab-Examples/blob/main/graphics/Example%207/VPDMAX.png) to view the graphic created in Example 7. 
 
 # Documentation
 
