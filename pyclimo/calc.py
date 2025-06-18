@@ -5,6 +5,8 @@ This file holds the functions that perform calculations.
 """
 import math
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
 def round_to_quarter(x):
     """
