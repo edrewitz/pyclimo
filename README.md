@@ -4,6 +4,21 @@
 
 An open source climate data analysis and visualization package. 
 
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/pyclimo.svg)](https://anaconda.org/conda-forge/pyclimo)  ![PyPI](https://img.shields.io/pypi/v/pyclimo?label=pypi%20pyclimo) [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/pyclimo.svg)](https://anaconda.org/conda-forge/pyclimo) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/pyclimo/badges/latest_release_date.svg)](https://anaconda.org/conda-forge/pyclimo) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/pyclimo/badges/latest_release_relative_date.svg)](https://anaconda.org/conda-forge/pyclimo)  [![Anaconda-Server Badge](https://anaconda.org/conda-forge/pyclimo/badges/license.svg)](https://anaconda.org/conda-forge/pyclimo) 
+
+[![Conda Recipe](https://img.shields.io/badge/recipe-pyclimo-green.svg)](https://anaconda.org/conda-forge/pyclimo) 
+      <a href="https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=25671&branchName=main">
+        <img src="https://dev.azure.com/conda-forge/feedstock-builds/_apis/build/status/pyclimo-feedstock?branchName=main">
+
+
+Anaconda Downloads:
+
+ [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/pyclimo.svg)](https://anaconda.org/conda-forge/pyclimo)
+
+ PIP Downloads:
+
+ ![PyPI - Downloads](https://img.shields.io/pypi/dm/pyclimo)
+
 # Table of Contents
 
 [Documentation](https://github.com/edrewitz/pyclimo/blob/main/README.md#documentation)
