@@ -1,4 +1,5 @@
-
+import warnings
+warnings.filterwarnings('ignore')
 
 def get_cwa_coords(cwa):
 
