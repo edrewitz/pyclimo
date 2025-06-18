@@ -549,3 +549,4 @@ rasterio: @software{gillies_2019,
   url = "https://github.com/rasterio/rasterio"
 }
 
+geopandas: Kelsey Jordahl, Joris Van den Bossche, Martin Fleischmann, Jacob Wasserman, James McBride, Jeffrey Gerard, … François Leblanc. (2020, July 15). geopandas/geopandas: v0.8.1 (Version v0.8.1). Zenodo. http://doi.org/10.5281/zenodo.3946761
