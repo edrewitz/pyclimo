@@ -16,6 +16,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from dateutil import tz
+from cartopy.util import add_cyclic_point
 from pyclimo.time_funcs import get_timezone_abbreviation, get_timezone, plot_creation_time
 from pyclimo.noaa_psl_data import get_psl_netcdf
 from pyclimo.calc import celsius_to_fahrenheit, roundup, rounddown, mm_to_in
@@ -116,18 +117,10 @@ def plot_titles(variable, level_type):
     return titles
 
 
-def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date, globe=False, to_fahrenheit=True, shrink=1, x1=0.01, y1=-0.03, x2=0.725, y2=-0.025, y3=-0.05, signature_fontsize=6, stamp_fontsize=5, level='500'):
+def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date, globe=False, to_fahrenheit=True, shrink=1, x1=0.01, y1=-0.03, x2=0.725, y2=-0.025, y3=-0.05, signature_fontsize=6, stamp_fontsize=5, level='500', hemispheric_view=False, hemisphere='N'):
 
     """
     This function plots NCAR Reanalysis netCDF4 data from the NOAA Physical Science Laboratory. 
-
-    The series of plots include:
-    
-    i) Period Mean
-    ii) Spatial EOF1 
-    iii) Spatial EOF2
-    iv) EOF1 Scores
-    v) EOF2 Scores
 
     Required Arguments:
 
@@ -266,6 +259,10 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         '20'
         '10'
 
+    12) hemispheric_view (Boolean) - Default = False. When set to True, the view will be a Polar Stereographic of either the Northern or Southern Hemisphere.
+
+    13) hemisphere (String) - Default = 'N'. When set to 'N' the hemispheric view will be that of the Northern Hemisphere. Set to 'S' for Southern Hemisphere. 
+
     Returns
     -------
     1) A plot of the mean value for the variable for the period. 
@@ -285,6 +282,26 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         eastern_bound = eastern_bound
         southern_bound = southern_bound
         northern_bound = northern_bound
+
+    if hemispheric_view == True:
+
+        if hemisphere == 'N':
+            mapcrs = ccrs.NorthPolarStereo()
+            western_bound = -180
+            eastern_bound = 180
+            southern_bound = 25
+            northern_bound = 90
+            shrink = 0.85
+        
+        if hemisphere == 'S':
+            mapcrs = ccrs.SouthPolarStereo()
+            western_bound = -180
+            eastern_bound = 180
+            southern_bound = -90
+            northern_bound = -25
+            shrink = 0.85
+    else:
+        mapcrs = ccrs.PlateCarree()
     
     path, path_print = noaa_psl_directory(variable, level_type, western_bound, eastern_bound, southern_bound, northern_bound, start_date, end_date, 'NCAR Reanalysis', level)
 
@@ -294,30 +311,22 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
     level_idx = level_idx[level]
 
     model = xe.single.EOF(use_coslat=True)
-    model.fit(ds, dim="time")
+    model.fit(ds[variable], dim="time")
     model.explained_variance_ratio()
     components = model.components()
     scores = model.scores()
-    avg = ds.mean(dim='time')
-
-    eof_range = np.nanmax(components[variable]) + abs(np.nanmin(components[variable]))
-    rs = -1 * eof_range
-    re = eof_range + 0.001
-    eof_levels = np.arange(rs, re, 0.001)
-    if variable == 'prate':
-        eof_ticks = eof_levels[::40]
-    else:
-        eof_ticks = eof_levels[::20]
+    avg = ds[variable].mean(dim='time')      
+    
     eof_cmap = cmaps.eof_colormap_1()
 
     if variable == 'air' or variable == 'skt':
-        avg[variable] = avg[variable] - 273.15
+        avg = avg - 273.15
         mean_cmap = cmaps.temperature_colormap()
         extend = 'both'
         if to_fahrenheit == True:
-            avg[variable] = celsius_to_fahrenheit(avg[variable])
-            minima = int(round(np.nanmin(avg[variable]), -1))
-            maxima = int(round(np.nanmax(avg[variable]), -1))
+            avg = celsius_to_fahrenheit(avg)
+            minima = int(round(np.nanmin(avg), -1))
+            maxima = int(round(np.nanmax(avg), -1))
             mean_levels = np.arange(minima, (maxima + 1), 1)
             mean_ticks = mean_levels[::5]
             unit = '[°F]'
@@ -325,15 +334,15 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         else:
             unit = '[°C]'
             funit = '[°C]'
-            mean_levels = np.arange(np.nanmin(avg[variable]), (np.nanmax(avg[variable])+0.5), 0.5)
+            mean_levels = np.arange(np.nanmin(avg), (np.nanmax(avg)+0.5), 0.5)
             mean_ticks = mean_levels[::5]
     else:
         pass
 
     if variable == 'pottmp':
         mean_cmap = cmaps.temperature_colormap()
-        minima = np.nanmin(avg[variable])
-        maxima = np.nanmax(avg[variable])
+        minima = np.nanmin(avg)
+        maxima = np.nanmax(avg)
         top = maxima + 1
         mean_levels = np.arange(minima, top, 1)
         mean_ticks = mean_levels[::5]
@@ -343,8 +352,8 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
 
     if variable == 'lftx':
         mean_cmap = cmaps.vertical_velocity_colormap()
-        minima = int(round(np.nanmin(avg[variable]),0))
-        maxima = int(round(np.nanmax(avg[variable]),0))
+        minima = int(round(np.nanmin(avg),0))
+        maxima = int(round(np.nanmax(avg),0))
         top = maxima + 1
         mean_levels = np.arange(minima, top, 1)
         mean_ticks = mean_levels[::5]
@@ -364,8 +373,8 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
     if variable == 'prate':
         mean_cmap = cmaps.relative_humidity_colormap()
         eof_cmap = cmaps.eof_colormap_2()
-        avg[variable] = avg[variable] * 3600
-        maxima = np.nanmax(avg[variable])
+        avg = avg * 3600
+        maxima = np.nanmax(avg)
         top = maxima + 0.01
         mean_levels = np.arange(0, top, 0.01)
         mean_ticks = mean_levels[::5]
@@ -376,7 +385,7 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
     if variable == 'pr_wtr':
         mean_cmap = cmaps.relative_humidity_colormap()
         eof_cmap = cmaps.eof_colormap_2()
-        maxima = np.nanmax(avg[variable])
+        maxima = np.nanmax(avg)
         top = maxima + 1
         mean_levels = np.arange(0, top, 1)
         mean_ticks = mean_levels[::5]
@@ -385,10 +394,10 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         funit = '[mm]'
 
     if variable == 'slp' or variable == 'pres':
-        avg[variable] = avg[variable]/100
+        avg = avg/100
         mean_cmap = cmaps.temperature_colormap()
-        minima = int(round(np.nanmin(avg[variable]), -1))
-        maxima = int(round(np.nanmax(avg[variable]), -1))
+        minima = int(round(np.nanmin(avg), -1))
+        maxima = int(round(np.nanmax(avg), -1))
         mean_levels = np.arange(minima, (maxima + 1), 1)
         mean_ticks = mean_levels[::5] 
         unit = '[hPa]'
@@ -396,10 +405,9 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         extend = 'both'
 
     if variable == 'omega':
-        avg[variable] = avg[variable]
         mean_cmap = cmaps.vertical_velocity_colormap()
-        minima = round(np.nanmin(avg[variable]), 2)
-        maxima = round(np.nanmax(avg[variable]), 2)
+        minima = round(np.nanmin(avg), 2)
+        maxima = round(np.nanmax(avg), 2)
         mean_levels = np.arange(minima, (maxima + 0.01), 0.01)
         mean_ticks = mean_levels[::5]
         unit = '[Pa*s^-1]'
@@ -407,10 +415,9 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         extend = 'both'
 
     if variable == 'lhtfl' or variable == 'shtfl' or variable == 'cfnlf':
-        avg[variable] = avg[variable]
         mean_cmap = cmaps.vertical_velocity_colormap()
-        minima = int(round(np.nanmin(avg[variable]), 0))
-        maxima = int(round(np.nanmax(avg[variable]), 0))
+        minima = int(round(np.nanmin(avg), 0))
+        maxima = int(round(np.nanmax(avg), 0))
         mean_levels = np.arange(minima, (maxima + 1), 1)
         if variable == 'lhtfl':
             mean_ticks = mean_levels[::10]
@@ -423,10 +430,9 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         extend = 'both'
 
     if variable == 'uwnd' or variable == 'vwnd':
-        avg[variable] = avg[variable]
         mean_cmap = cmaps.vertical_velocity_colormap()
-        minima = int(round(np.nanmin(avg[variable]), 0))
-        maxima = int(round(np.nanmax(avg[variable]), 0))
+        minima = int(round(np.nanmin(avg), 0))
+        maxima = int(round(np.nanmax(avg), 0))
         mean_levels = np.arange(minima, (maxima + 1), 1)
         mean_ticks = mean_levels[::5]
         unit = '[m*s^-1]'
@@ -434,15 +440,23 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         extend = 'both'
 
     if variable == 'hgt':
-        avg[variable] = (avg[variable][level_idx, :, :])/10
+        avg = (avg[level_idx, :, :])/10
         mean_cmap = cmaps.temperature_colormap()
-        minima = int(round(np.nanmin(avg[variable]), -1))
-        maxima = int(round(np.nanmax(avg[variable]), -1))
+        minima = int(round(np.nanmin(avg), -1))
+        maxima = int(round(np.nanmax(avg), -1))
         mean_levels = np.arange(minima, (maxima + 1), 1)
         mean_ticks = mean_levels[::5] 
         unit = '[DM]'
         funit = '[DM]'
         extend = 'both'
+
+    avg_lon = avg['lon']
+    avg_lon_idx = avg.dims.index('lon')
+    cyclic_avg, cyclic_avg_lon = add_cyclic_point(avg.values, coord=avg_lon, axis=avg_lon_idx)
+
+    eofs_lon = components['lon']
+    eofs_lon_idx = components.dims.index('lon')
+    cyclic_eof, cyclic_eof_lon = add_cyclic_point(components, coord=eofs_lon, axis=eofs_lon_idx)
 
     title = plot_titles(variable, level_type)
     title = title[variable]
@@ -472,9 +486,9 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
             ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
             ax.text(x2, y2, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
             try:
-                cs = ax.contourf(avg['lon'], avg['lat'], avg[variable][:, :], levels=mean_levels, transform=datacrs, cmap=mean_cmap, extend=extend)
+                cs = ax.contourf(cyclic_avg_lon, avg['lat'], cyclic_avg[:, :], levels=mean_levels, transform=datacrs, cmap=mean_cmap, extend=extend)
             except Exception as e:
-                cs = ax.contourf(avg['lon'], avg['lat'], avg[variable][level_idx, :, :], levels=mean_levels, transform=datacrs, cmap=mean_cmap, extend=extend)
+                cs = ax.contourf(cyclic_avg_lon, avg['lat'], cyclic_avg[level_idx, :, :], levels=mean_levels, transform=datacrs, cmap=mean_cmap, extend=extend)
             cbar = cbar = fig.colorbar(cs, shrink=shrink, pad=0.01, location='right', ticks=mean_ticks)
             fig.savefig(f"{path}/{fname}", bbox_inches='tight')
             plt.close(fig)
@@ -490,10 +504,9 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
             ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
             ax.text(x2, y2, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
             try:
-                cs = ax.contourf(components['lon'], components['lat'], components[variable][0, :, :], levels=eof_levels, transform=datacrs, cmap=eof_cmap, extend='both')
+                cs = ax.contourf(cyclic_eof_lon, components['lat'], cyclic_eof[0, :, :], transform=datacrs, cmap=eof_cmap, extend='both')
             except Exception as e:
-                cs = ax.contourf(components['lon'], components['lat'], components[variable][0, level_idx, :, :], levels=eof_levels, transform=datacrs, cmap=eof_cmap, extend='both')
-            cbar = fig.colorbar(cs, shrink=shrink, pad=0.01, location='right', ticks=eof_ticks)
+                cs = ax.contourf(cyclic_eof_lon, components['lat'], cyclic_eof[0, level_idx, :, :], transform=datacrs, cmap=eof_cmap, extend='both')
             fig.savefig(f"{path}/{fname}", bbox_inches='tight')
             plt.close(fig)
             print(f"Saved {fname} to {path_print}")   
@@ -508,10 +521,9 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
             ax.text(x1, y1, "Plot Created With PyClimo (C) Eric J. Drewitz " +utc_time.strftime('%Y')+" | Data Source: NOAA PSL: psl.noaa.gov", transform=ax.transAxes, fontsize=signature_fontsize, fontweight='bold', bbox=props)
             ax.text(x2, y2, "Image Created: " + local_time.strftime(f'%m/%d/%Y %H:%M {timezone}') + " (" + utc_time.strftime('%H:%M UTC') + ")", transform=ax.transAxes, fontsize=stamp_fontsize, fontweight='bold', bbox=props)
             try:
-                cs = ax.contourf(components['lon'], components['lat'], components[variable][1, :, :], levels=eof_levels, transform=datacrs, cmap=eof_cmap, extend='both')
+                cs = ax.contourf(cyclic_eof_lon, components['lat'], cyclic_eof[1, :, :], transform=datacrs, cmap=eof_cmap, extend='both')
             except Exception as e:
-                cs = ax.contourf(components['lon'], components['lat'], components[variable][1, level_idx, :, :], levels=eof_levels, transform=datacrs, cmap=eof_cmap, extend='both')
-            cbar = fig.colorbar(cs, shrink=shrink, pad=0.01, location='right', ticks=eof_ticks)
+                cs = ax.contourf(cyclic_eof_lon, components['lat'], cyclic_eof[1, level_idx, :, :], transform=datacrs, cmap=eof_cmap, extend='both')
             fig.savefig(f"{path}/{fname}", bbox_inches='tight')
             plt.close(fig)
             print(f"Saved {fname} to {path_print}")   
@@ -545,6 +557,7 @@ def plot_ncar_reanalysis_data_period_mean_eof1_eof2(variable, level_type, wester
         plt.close(fig)
         print(f"Saved {fname} to {path_print}")  
         e = e + 1
+        
         
 
     
