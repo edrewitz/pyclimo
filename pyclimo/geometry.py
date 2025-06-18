@@ -9,6 +9,7 @@ This file imports all needed shapefiles and their components for users to choose
 import urllib.request
 import os
 import matplotlib.pyplot as plt
+import geopandas as gpd
 import cartopy.crs as ccrs
 import warnings
 warnings.filterwarnings('ignore')
@@ -16,6 +17,31 @@ warnings.filterwarnings('ignore')
 from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
 from pyclimo.prism_data import extract_zipped_files
+
+def get_geo_json(file_path):
+
+     """
+     This function extracts a local geojson file if the user wishes to import custom geometrical boundaries.
+
+     Required Arguments:
+
+     1) file_path (String) - The path to the geojson file
+
+     Optional Arguments: None
+
+     Returns
+     -------
+
+     1) The geometries of the geojson file. 
+     """
+
+    crs = ccrs.PlateCarree()
+    gdf = gpd.read_file(file_path)
+    gdf_reproj = gdf.to_crs(crs.proj4_init)
+
+    shapes = gdf_reproj['geometry']
+
+    return shapes
 
 def get_shapes(file_path):
 
