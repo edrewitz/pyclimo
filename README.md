@@ -600,3 +600,5 @@ rasterio: @software{gillies_2019,
 }
 
 geopandas: Kelsey Jordahl, Joris Van den Bossche, Martin Fleischmann, Jacob Wasserman, James McBride, Jeffrey Gerard, … François Leblanc. (2020, July 15). geopandas/geopandas: v0.8.1 (Version v0.8.1). Zenodo. http://doi.org/10.5281/zenodo.3946761
+
+FireWxPy: Eric J. Drewitz. (2025). edrewitz/firewxpy: FireWxPy v1.6.2 (FireWxPy1.6.2). Zenodo. https://doi.org/10.5281/zenodo.15620392
