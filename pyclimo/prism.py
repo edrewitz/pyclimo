@@ -211,10 +211,6 @@ def plot_prism_data(dtype, variable, year, month, day, normal_type, clear_data_i
         
         Alaska: Setting state='AK' or state='ak' suffices here. Leave gacc_region=None and set the state variable as shown. 
 
-        Other regions include: 
-        
-        Southern California Edison's Service Area (region='sce' or region='SCE')
-
     28) x1 (Float) - Default = 0.01. The x-position of the signature text box with respect to the axis of the image. 
 
     29) y1 (Float) - Default = -0.03. The y-position of the signature text box with respect to the axis of the image. 
