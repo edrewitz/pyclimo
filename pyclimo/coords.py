@@ -704,18 +704,6 @@ def get_region_info(region):
         x3, y3 = 0.01, 0.01
         signature_fontsize = 6
         stamp_fontsize = 5
-
-    if region == 'SCE' or region == 'sce':
-        western_bound = -120.9
-        eastern_bound = -113.93
-        southern_bound = 33
-        northern_bound = 39.06
-        shrink = 0.75
-        x1, y1 = 0.01, -0.03
-        x2, y2 = 0.725, -0.025
-        x3, y3 = 0.01, 0.01
-        signature_fontsize = 6
-        stamp_fontsize = 5
         
     if region == 'ONCC' or region == 'oncc' or region == 'NOPS' or region == 'nops':
         western_bound = -124.8
